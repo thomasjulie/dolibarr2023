@@ -1,0 +1,53 @@
+# Copyright (C) 2023 SuperAdmin
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Generic
+#
+
+# Module label 'ModuleCustomizeProspectCustomerFieldName'
+ModuleCustomizeProspectCustomerFieldName = Customization of the Prospect / Customer field
+# Module description 'ModuleCustomizeProspectCustomerFieldDesc'
+ModuleCustomizeProspectCustomerFieldDesc = This module allow the customization of the dropdown list "Prospect / Customer" in the module "Third Parties".
+#
+# Admin page
+#
+CustomizeProspectCustomerFieldSetup = CustomizeProspectCustomerField setup
+Settings = Settings
+CustomizeProspectCustomerFieldSetupPage = Customize Prospect / Customer Field setup page
+CUSTOMIZEPROSPECTCUSTOMERFIELD_MYPARAM1 = My param 1
+CUSTOMIZEPROSPECTCUSTOMERFIELD_MYPARAM1Tooltip = My param 1 tooltip
+CUSTOMIZEPROSPECTCUSTOMERFIELD_MYPARAM2=My param 2
+CUSTOMIZEPROSPECTCUSTOMERFIELD_MYPARAM2Tooltip=My param 2 tooltip
+
+
+#
+# About page
+#
+About = About
+CustomizeProspectCustomerFieldAbout = About CustomizeProspectCustomerField
+CustomizeProspectCustomerFieldAboutPage = CustomizeProspectCustomerField about page
+
+#
+# Sample page
+#
+CustomizeProspectCustomerFieldArea = Home CustomizeProspectCustomerField
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
