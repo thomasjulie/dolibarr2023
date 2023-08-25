@@ -1,0 +1,3 @@
+Dans le if action send, après l'envoi du sms, placer la ligne : 
+
+header('Location: ' . GETPOST('returnurl') . '&msg=' . urlencode($body));// Redirect to returnurl

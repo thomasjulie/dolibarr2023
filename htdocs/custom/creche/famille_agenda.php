@@ -177,6 +177,22 @@ if (empty($reshook)) {
 	}
 }
 
+if ($action == 'sendSms') {
+	$msg = GETPOST('msg');
+	
+	$selectRef = "SELECT ref FROM llx_actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+	$refReq = $db->query($selectRef);
+	$refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
+	$refLast++; // faire +1 à la dernière ref
+
+	$sql = "INSERT INTO llx_actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
+	VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 69, 'CRECHE_FAMILLE_SMS', 'SMS', '" 
+	. $db->escape($msg) . "', " . $object->id . ", 'famille')";
+	$req = $db->query($sql);
+
+	header('Location: '.$_SERVER["PHP_SELF"].'?id=' . $object->id);
+	exit;
+}
 
 
 /*
@@ -202,8 +218,8 @@ if ($object->id > 0) {
 			FROM llx_actioncomm 
 			WHERE code LIKE '%CRECHE%' 
 			AND elementtype LIKE 'famille' 
-			AND fk_element = " . $object->id;
-	// echo '<pre>';var_dump($sql);echo '</pre>';
+			AND fk_element = " . $object->id . " 
+			ORDER BY datep DESC";
 	$req = $db->query($sql);
 
 	// Object card
@@ -220,7 +236,7 @@ if ($object->id > 0) {
 				<tr>
 					<td class="nobordernopadding valignmiddle col-title"></td>
 					<td class="nobordernopadding valignmiddle right col-right">
-						<a class="btnTitle btnTitlePlus" href="#" title="Créer événement">
+						<a class="btnTitle btnTitlePlus" href="/custom/creche/evenement.php?token=<?= newToken() ?>&famid=<?= $object->id ?>" title="Créer événement">
 							<span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span>
 						</a>
 					</td>
@@ -233,6 +249,7 @@ if ($object->id > 0) {
 				<tr class="liste_titre">
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Titre") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Description") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Début") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Fin") ?></th>
 				</tr>
@@ -240,10 +257,35 @@ if ($object->id > 0) {
 			<tbody>
 				<?php while ($res = $db->fetch_object($req)): ?>
 					<tr>
-						<td class="<?= ($res->code == 'CRECHE_FAMILLE') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->label ?></td>
-						<td class="<?= ($res->code == 'CRECHE_FAMILLE') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->note ?></td>
-						<td class="<?= ($res->code == 'CRECHE_FAMILLE') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->datep ?></td>
-						<td class="<?= ($res->code == 'CRECHE_FAMILLE') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->datep2 ?></td>
+						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
+							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->label ?></td>
+						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
+							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->note ?></td>
+						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
+							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>">
+							<?php switch ($res->code) {
+								case 'CRECHE_FAMILLE_MAIL':
+								case 'FAMILLE_CRECHE_MAIL':
+									echo 'e-mail';
+									break;
+								case 'CRECHE_FAMILLE_SMS':
+								case 'FAMILLE_CRECHE_SMS':
+									echo 'sms';
+									break;
+								default:
+									echo 'message';
+									break;
+							} ?>
+						</td>
+						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
+							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->datep ?></td>
+						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
+							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->datep2 ?></td>
 					</tr>
 				<?php endwhile; ?>
 			</tbody>

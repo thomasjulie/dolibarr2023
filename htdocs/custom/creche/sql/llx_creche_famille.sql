@@ -20,6 +20,7 @@ CREATE TABLE llx_creche_famille(
 	libelle varchar(100) NOT NULL, 
 	mail varchar(150), 
 	tel_portable varchar(20), 
+	entity int NOT NULL,
 	fk_user_create integer NOT NULL, 
 	date_create datetime NOT NULL, 
 	fk_user_update integer NOT NULL, 

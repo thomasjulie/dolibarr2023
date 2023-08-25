@@ -557,10 +557,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print "</form>\n";
 	}
 
-
+	// echo '<pre>';var_dump($object);echo '</pre>';
 	// Buttons for actions
 
-	if ($action != 'presend' && $action != 'editline') {
+	if ($action != 'presend' && $action != 'editline' && $action != 'presendSms') {
 		print '<div class="tabsAction">'."\n";
 		$parameters = array();
 		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
@@ -572,6 +572,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			// Send
 			if (empty($user->socid)) {
 				print dolGetButtonAction('', $langs->trans('SendMail'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&token='.newToken().'&mode=init#formmailbeforetitle');
+			}
+
+			if (empty($user->socid)) {
+				$params = [];
+				if ($object->tel_portable == null || $object->tel_portable == ''  
+					|| preg_match("#^(\+33|0)[67][0-9]{8}$#", $object->tel_portable) == 0) {
+					$params = ['attr' => ['classOverride' => 'butActionRefused', 'href' => '#']];
+				}
+				print dolGetButtonAction('', $langs->trans('SendSms'), 'default', 
+				$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presendSms&sendto=' . urlencode($object->tel_portable) . '&token='
+				.newToken() , '', 1, $params);
 			}
 
 			// Back to draft
@@ -658,7 +669,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$diroutput = $conf->creche->dir_output;
 	$trackid = 'famille'.$object->id;
 
-	// include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+	// Formulaire envoie d'email
 	if ($action == 'presend') {
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
 		$formmail = new FormMail($db);
@@ -712,6 +723,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		
 	}
 
+	// Envoie email
 	if ($action == 'send') {
 		require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
@@ -729,7 +741,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		$message = GETPOST('message');
 		$from = $user->email;
 
-		// echo'<pre>';var_dump($sendto, $from);echo'</pre>';die;
 		$mailfile = new CMailFile($subject, $sendto, $from, $message, $filepath, $mimetype, $filename, $sendtocc);
 		
 		if (!empty($mailfile->error) || !empty($mailfile->errors)) {
@@ -745,6 +756,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				if (isset($paramname2) || isset($paramval2)) {
 					$moreparam .= '&'.($paramname2 ? $paramname2 : 'mid').'='.$paramval2;
 				}
+				
+				$selectRef = "SELECT ref FROM llx_actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+				$refReq = $db->query($selectRef);
+				$refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
+				$refLast++; // faire +1 à la dernière ref
+				$sql = "INSERT INTO llx_actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
+				VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 67, 'CRECHE_FAMILLE_MAIL', '" . $db->escape($subject) . "', '" 
+				. $db->escape($message) . "', " . $object->id . ", 'famille')";
+				$req = $db->query($sql);
+
 				header('Location: '.$_SERVER["PHP_SELF"].'?'.($paramname ? $paramname : 'id').'='.(is_object($object) ? $object->id : '').$moreparam);
 				exit;
 			} else {
@@ -772,6 +793,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				$action = 'presend';
 			}
 		}
+
+	}
+
+	if ($action == 'presendSms') {
+		include DOL_DOCUMENT_ROOT.'/custom/creche/smsform.php';
 
 	}
 }
