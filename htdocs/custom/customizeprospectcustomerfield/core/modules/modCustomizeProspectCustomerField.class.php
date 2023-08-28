@@ -115,7 +115,9 @@ class modCustomizeProspectCustomerField extends DolibarrModules
 			),
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
 			'hooks' => array(
-				'customizeprospectcustomerfield'
+				'thirdpartycard',
+				'thirdpartylist',
+				'supplierlist'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',

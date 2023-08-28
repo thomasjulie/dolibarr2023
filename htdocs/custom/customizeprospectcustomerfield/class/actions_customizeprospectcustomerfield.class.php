@@ -23,6 +23,8 @@
  * Put detailed description here.
  */
 
+use Luracast\Restler\Data\Arr;
+
 /**
  * Class ActionsCustomizeProspectCustomerField
  */
@@ -97,32 +99,100 @@ class ActionsCustomizeProspectCustomerField
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function prospectcustomerfield($parameters, &$object, &$action, $hookmanager)
+	public function selectProspectCustomerType($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 
 		$error = 0; // Error counter
-
-		if ('customizeprospectcustomerfield' == $parameters['currentcontext']) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		
+		if (in_array($parameters['currentcontext'], array('thirdpartycard', 'thirdpartylist', 'supplierlist'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->customizeprospectcustomerfield->enabled) {
-				$out = '<select class="flat" name="client" id="customerprospect">';
+				if ($parameters['currentcontext'] == 'thirdpartylist' || $parameters['currentcontext'] == 'supplierlist') {
+					$out = '<select class="flat" name="search_type" id="search_type">';
+				} else  {
+					$out = '<select class="flat" name="client" id="customerprospect">';
+				}
 				$out .= '<option value="-1"></option>';
 				
 				$sql = "SELECT * FROM " . $this->db->prefix() . "prospectCustomerType";
 				$req = $this->db->query($sql);
 				while ($obj = $this->db->fetch_object($req)) {
 					if ($obj->active == 1) {
-						$out .= '<option value="' . $obj->code . '">'.$langs->trans($obj->label).'</option>';
+						$out .= '<option value="' . $obj->code . '" ' 
+						. ($parameters['client_type'] == $obj->code ? ' selected' : '') . '>'.$langs->trans($obj->label).'</option>';
 					}
 				}
 				
 				$out .= '</select>';
-				$out .= ajax_combobox('customerprospect');
+				if ($parameters['currentcontext'] == 'thirdpartylist' || $parameters['currentcontext'] == 'supplierlist') {
+					$out .= ajax_combobox('search_type');
+				} else  {
+					$out .= ajax_combobox('customerprospect');
+				}
 				// $this->resprints = $out;
 				echo $out;
 				return 1;
 			}
 
+		}
+
+		if (!$error) {
+			// $this->results = array('myreturn' => 999);
+			// $this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+	
+	public function getTypeUrl($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+
+		$error = 0; // Error counter
+		
+		if (in_array($parameters['currentcontext'], array('thirdpartylist', 'thirdpartycard'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			if ($conf->customizeprospectcustomerfield->enabled) {
+				$sql = "SELECT * FROM " . $this->db->prefix() . "prospectCustomerType WHERE code = " . $parameters['client_type'];
+				$req = $this->db->query($sql);
+				while ($obj = $this->db->fetch_object($req)) {
+					$out = $langs->trans($obj->label);
+				}
+				
+				echo $out;
+				return 1;
+			}
+		}
+
+		if (!$error) {
+			// $this->results = array('myreturn' => 999);
+			// $this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+	
+	public function filterType($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+
+		$error = 0; // Error counter
+		
+		if (in_array($parameters['currentcontext'], array('thirdpartylist', 'supplierlist'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			if ($conf->customizeprospectcustomerfield->enabled) {
+				if ($parameters['search_type'] > 0) {
+					if ($parameters['search_type'] != 4) {
+						$object .= " AND s.client IN (".$this->db->sanitize($parameters['search_type']).")";
+					}
+					if ($parameters['currentcontext'] == 'supplierlist') {
+						$object .= " AND s.fournisseur = 1";
+					}
+				}
+				return 1;
+			}
 		}
 
 		if (!$error) {
