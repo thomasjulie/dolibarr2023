@@ -276,6 +276,24 @@ if ($action == 'create') {
 		print '<input type="hidden" name="dol_openinpopup" value="'.$dol_openinpopup.'">';
 	}
 
+	print '<input type="hidden" name="fk_user_create" value="'.$user->id.'">';
+	print '<input type="hidden" name="fk_user_update" value="'.$user->id.'">';
+	print '<input type="hidden" name="date_create" value="'.date('Y-m-d H:i:s').'">';
+	print '<input type="hidden" name="date_createyear" value="'.date('Y').'">';
+	print '<input type="hidden" name="date_createmonth" value="'.date('m').'">';
+	print '<input type="hidden" name="date_createday" value="'.date('d').'">';
+	print '<input type="hidden" name="date_createhour" value="'.date('H').'">';
+	print '<input type="hidden" name="date_createmin" value="'.date('i').'">';
+	print '<input type="hidden" name="date_createsec" value="'.date('s').'">';
+
+	print '<input type="hidden" name="date_update" value="'.date('Y-m-d H:i:s').'">';
+	print '<input type="hidden" name="date_updateyear" value="'.date('Y').'">';
+	print '<input type="hidden" name="date_updatemonth" value="'.date('m').'">';
+	print '<input type="hidden" name="date_updateday" value="'.date('d').'">';
+	print '<input type="hidden" name="date_updatehour" value="'.date('H').'">';
+	print '<input type="hidden" name="date_updatemin" value="'.date('i').'">';
+	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
+
 	print dol_get_fiche_head(array(), '');
 
 	// Set some default values
@@ -284,6 +302,12 @@ if ($action == 'create') {
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
 	// Common attributes
+	unset($object->fields['rowid']);
+	unset($object->fields['fk_user_create']);
+	unset($object->fields['date_create']);
+	unset($object->fields['fk_user_update']);
+	unset($object->fields['date_update']);
+
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
 	// Other attributes
@@ -315,11 +339,26 @@ if (($id || $ref) && $action == 'edit') {
 		print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 	}
 
+	print '<input type="hidden" name="fk_user_update" value="'.$user->id.'">';
+	print '<input type="hidden" name="date_update" value="'.date('Y-m-d H:i:s').'">';
+	print '<input type="hidden" name="date_updateyear" value="'.date('Y').'">';
+	print '<input type="hidden" name="date_updatemonth" value="'.date('m').'">';
+	print '<input type="hidden" name="date_updateday" value="'.date('d').'">';
+	print '<input type="hidden" name="date_updatehour" value="'.date('H').'">';
+	print '<input type="hidden" name="date_updatemin" value="'.date('i').'">';
+	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
+
 	print dol_get_fiche_head();
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
 	// Common attributes
+	unset($object->fields['rowid']);
+	unset($object->fields['fk_user_create']);
+	unset($object->fields['date_create']);
+	unset($object->fields['fk_user_update']);
+	unset($object->fields['date_update']);
+
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 
 	// Other attributes
@@ -349,13 +388,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// Confirmation to delete line
 	if ($action == 'deleteline') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans('DeleteLine'), $langs->trans('ConfirmDeleteLine'), 'confirm_deleteline', '', 0, 1);
-	}
-
-	// Clone confirmation
-	if ($action == 'clone') {
-		// Create an array for form
-		$formquestion = array();
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneAsk', $object->ref), 'confirm_clone', $formquestion, 'yes', 1);
 	}
 
 	// Confirmation of action xxxx (You can use it for xxx = 'close', xxx = 'reopen', ...)
@@ -436,7 +468,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$morehtmlref .= '</div>';
 
 
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 
 
 	print '<div class="fichecenter">';
@@ -448,6 +480,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
 	//unset($object->fields['fk_project']);				// Hide field already shown in banner
 	//unset($object->fields['fk_soc']);					// Hide field already shown in banner
+	unset($object->fields['rowid']);
+	unset($object->fields['fk_user_create']);
+	unset($object->fields['date_create']);
+	unset($object->fields['fk_user_update']);
+	unset($object->fields['date_update']);
+
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
@@ -524,32 +562,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		}
 
 		if (empty($reshook)) {
-			// Send
-			if (empty($user->socid)) {
-				print dolGetButtonAction('', $langs->trans('SendMail'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&token='.newToken().'&mode=init#formmailbeforetitle');
-			}
-
 			// Back to draft
 			if ($object->status == $object::STATUS_VALIDATED) {
 				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
 			}
 
 			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
-
-			// Validate
-			if ($object->status == $object::STATUS_DRAFT) {
-				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
-					print dolGetButtonAction('', $langs->trans('Validate'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_validate&confirm=yes&token='.newToken(), '', $permissiontoadd);
-				} else {
-					$langs->load("errors");
-					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Validate"), 'default', '#', '', 0);
-				}
-			}
-
-			// Clone
-			if ($permissiontoadd) {
-				print dolGetButtonAction('', $langs->trans('ToClone'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid)?'&socid='.$object->socid:'').'&action=clone&token='.newToken(), '', $permissiontoadd);
-			}
 
 			/*
 			if ($permissiontoadd) {

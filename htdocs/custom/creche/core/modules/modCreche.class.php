@@ -365,7 +365,7 @@ class modCreche extends DolibarrModules
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=parents',
 			 'type' =>'left',
-			 'titre' =>'List Parents',
+			 'titre' =>'Liste Parents',
 			 'mainmenu' =>'creche',
 			 'leftmenu' =>'creche_parents_list',
 			 'url' =>'/creche/parents_list.php',
@@ -381,7 +381,7 @@ class modCreche extends DolibarrModules
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=parents',
 			 'type' =>'left',
-			 'titre' =>'New Parents',
+			 'titre' =>'Nouveau Parent',
 			 'mainmenu' =>'creche',
 			 'leftmenu' =>'creche_parents_new',
 			 'url' =>'/creche/parents_card.php?action=create',
@@ -413,7 +413,7 @@ class modCreche extends DolibarrModules
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=famille',
 			 'type' =>'left',
-			 'titre' =>'List Famille',
+			 'titre' =>'Liste Famille',
 			 'mainmenu' =>'creche',
 			 'leftmenu' =>'creche_famille_list',
 			 'url' =>'/creche/famille_list.php',
@@ -429,7 +429,7 @@ class modCreche extends DolibarrModules
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=famille',
 			 'type' =>'left',
-			 'titre' =>'New Famille',
+			 'titre' =>'Nouvelle Famille',
 			 'mainmenu' =>'creche',
 			 'leftmenu' =>'creche_famille_new',
 			 'url' =>'/creche/famille_card.php?action=create',
@@ -462,7 +462,7 @@ class modCreche extends DolibarrModules
         $this->menu[$r++]=array(
             'fk_menu'=>'fk_mainmenu=creche,fk_leftmenu=enfants',
             'type'=>'left',
-            'titre'=>'List Enfants',
+            'titre'=>'Liste Enfants',
             'mainmenu'=>'creche',
             'leftmenu'=>'creche_enfants_list',
             'url'=>'/creche/enfants_list.php',
@@ -476,7 +476,7 @@ class modCreche extends DolibarrModules
         $this->menu[$r++]=array(
             'fk_menu'=>'fk_mainmenu=creche,fk_leftmenu=enfants',
             'type'=>'left',
-            'titre'=>'New Enfants',
+            'titre'=>'Nouveau Enfant',
             'mainmenu'=>'creche',
             'leftmenu'=>'creche_enfants_new',
             'url'=>'/creche/enfants_card.php?action=create',

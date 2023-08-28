@@ -269,7 +269,7 @@ $form = new Form($db);
 
 $now = dol_now();
 
-$title = $langs->trans("Parentss");
+$title = $langs->trans("Parents");
 //$help_url = "EN:Module_Parents|FR:Module_Parents_FR|ES:Módulo_Parents";
 $help_url = '';
 $morejs = array();

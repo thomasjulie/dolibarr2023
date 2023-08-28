@@ -52,6 +52,8 @@ MyPageName = My page name
 #
 MyWidget = My widget
 MyWidgetDescription = My widget description
+Create = Créer
+
 
 
 ModuleCrecheName = Crèche   
@@ -59,3 +61,10 @@ Telportable = Tél. portable
 Libelle = Libellé
 Mail = E-mail
 SendSms = Envoyer SMS
+Modenotif = Type de notification
+Notif = Notification
+Mdp = Mot de passe
+Prenom = Prénom
+Codepostal = Code postal
+Civilite = Civilité
+Fkfamille = ID famille

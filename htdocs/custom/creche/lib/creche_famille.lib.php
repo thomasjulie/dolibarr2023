@@ -94,6 +94,16 @@ function famillePrepareHead($object)
 		$h++;
 	}
 
+	$head[$h][0] = dol_buildpath("/creche/famille_parents.php", 1).'?id='.$object->id;
+	$head[$h][1] = $langs->trans("Parents");
+	$head[$h][2] = 'parents';
+	$h++;
+	
+	$head[$h][0] = dol_buildpath("/creche/famille_enfants.php", 1).'?id='.$object->id;
+	$head[$h][1] = $langs->trans("Enfants");
+	$head[$h][2] = 'enfants';
+	$h++;
+
 	// Show more tabs from modules
 	// Entries must be declared in modules descriptor with line
 	//$this->tabs = array(
