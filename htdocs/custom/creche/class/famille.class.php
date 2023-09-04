@@ -118,6 +118,7 @@ class Famille extends CommonObject
 		'libelle' => array('type'=>'varchar(100)', 'label'=>'Libelle', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-1,),
 		'mail' => array('type'=>'varchar(150)', 'label'=>'Mail', 'enabled'=>'1', 'position'=>25, 'notnull'=>0, 'visible'=>-1,),
 		'tel_portable' => array('type'=>'varchar(20)', 'label'=>'Telportable', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>-1,),
+		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>15, 'notnull'=>0, 'visible'=>0,),
 		'fk_user_create' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkusercreate', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
 		'date_create' => array('type'=>'datetime', 'label'=>'Datecreate', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-1,),
 		'fk_user_update' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkuserupdate', 'enabled'=>'1', 'position'=>45, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),

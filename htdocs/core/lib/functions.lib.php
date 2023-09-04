@@ -2373,10 +2373,14 @@ function dol_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldi
 					}
 					$nophoto = img_picto('No photo', $prefix.$picto);
 				}
-				$morehtmlleft .= '<!-- No photo to show -->';
-				$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"><div class="photoref">';
-				$morehtmlleft .= $nophoto;
-				$morehtmlleft .= '</div></div>';
+				$actionHook = "edit"; 
+				$reshook = $hookmanager->executeHooks('displayImg', array('rowid' => $object->id), $morehtmlleft, $actionHook);
+				if (empty($reshook)) {
+					$morehtmlleft .= '<!-- No photo to show -->';
+					$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"><div class="photoref">';
+					$morehtmlleft .= $nophoto;
+					$morehtmlleft .= '</div></div>';
+				}
 			}
 		}
 	}

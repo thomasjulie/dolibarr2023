@@ -124,7 +124,11 @@ if ($action == 'add' && !empty($permissiontoadd)) {
 		}
 
 		//var_dump($key.' '.$value.' '.$object->fields[$key]['type']);
-		$object->$key = $value;
+		$actionHook = "edit";
+		$reshook = $hookmanager->executeHooks('inputFile', array('field' => $key, 'value' => $value), $object, $actionHook);
+		if (empty($reshook)) {
+			$object->$key = $value;
+		}
 		if (!empty($val['notnull']) && $val['notnull'] > 0 && $object->$key == '' && isset($val['default']) && $val['default'] == '(PROV)') {
 			$object->$key = '(PROV)';
 		}
@@ -267,7 +271,11 @@ if ($action == 'update' && !empty($permissiontoadd)) {
 			$value = ''; // This is an explicit foreign key field
 		}
 
-		$object->$key = $value;
+		$actionHook = "edit";
+		$reshook = $hookmanager->executeHooks('inputFile', array('field' => $key, 'value' => $value), $object, $actionHook);
+		if (empty($reshook)) {
+			$object->$key = $value;
+		}
 		if ($val['notnull'] > 0 && $object->$key == '' && is_null($val['default'])) {
 			$error++;
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv($val['label'])), null, 'errors');

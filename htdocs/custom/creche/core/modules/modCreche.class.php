@@ -115,6 +115,10 @@ class modCreche extends DolibarrModules
 			),
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
 			'hooks' => array(
+				'parentscard',
+				'crecheparentslist',
+				'enfantscard',
+				'enfantsdocument'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',
@@ -378,20 +382,20 @@ class modCreche extends DolibarrModules
 		);
 		/* END LEFTMENU LIST PARENTS */
 		/* LEFTMENU NEW PARENTS */
-		$this->menu[$r++]=array(
-			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=parents',
-			 'type' =>'left',
-			 'titre' =>'Nouveau Parent',
-			 'mainmenu' =>'creche',
-			 'leftmenu' =>'creche_parents_new',
-			 'url' =>'/creche/parents_card.php?action=create',
-			 'langs' =>'creche@creche',
-			 'position' =>1000 + $r,
-			 'enabled' =>'$conf->creche->enabled',
-			 'perms' =>'$user->hasRight("creche", "parents", "write")',
-			 'target' =>'',
-			 'user' =>2,
-		);
+// 		$this->menu[$r++]=array(
+// 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=parents',
+// 			 'type' =>'left',
+// 			 'titre' =>'Nouveau Parent',
+// 			 'mainmenu' =>'creche',
+// 			 'leftmenu' =>'creche_parents_new',
+// 			 'url' =>'/creche/parents_card.php?action=create',
+// 			 'langs' =>'creche@creche',
+// 			 'position' =>1000 + $r,
+// 			 'enabled' =>'$conf->creche->enabled',
+// 			 'perms' =>'$user->hasRight("creche", "parents", "write")',
+// 			 'target' =>'',
+// 			 'user' =>2,
+// 		);
 		/* END LEFTMENU NEW PARENTS */
 		/* LEFTMENU FAMILLE */
 		$this->menu[$r++]=array(
@@ -473,20 +477,20 @@ class modCreche extends DolibarrModules
             'target'=>'',
             'user'=>2,
         );
-        $this->menu[$r++]=array(
-            'fk_menu'=>'fk_mainmenu=creche,fk_leftmenu=enfants',
-            'type'=>'left',
-            'titre'=>'Nouveau Enfant',
-            'mainmenu'=>'creche',
-            'leftmenu'=>'creche_enfants_new',
-            'url'=>'/creche/enfants_card.php?action=create',
-            'langs'=>'creche@creche',
-            'position'=>1000+$r,
-            'enabled'=>'$conf->creche->enabled',
-			'perms'=>'$user->hasRight("creche", "enfants", "write")',
-            'target'=>'',
-            'user'=>2
-        );
+//         $this->menu[$r++]=array(
+//             'fk_menu'=>'fk_mainmenu=creche,fk_leftmenu=enfants',
+//             'type'=>'left',
+//             'titre'=>'Nouveau Enfant',
+//             'mainmenu'=>'creche',
+//             'leftmenu'=>'creche_enfants_new',
+//             'url'=>'/creche/enfants_card.php?action=create',
+//             'langs'=>'creche@creche',
+//             'position'=>1000+$r,
+//             'enabled'=>'$conf->creche->enabled',
+// 			'perms'=>'$user->hasRight("creche", "enfants", "write")',
+//             'target'=>'',
+//             'user'=>2
+//         );
 
 		/*END LEFTMENU ENFANTS*/
 		/* END MODULEBUILDER LEFTMENU MYOBJECT */

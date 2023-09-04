@@ -108,3 +108,19 @@ function parentsPrepareHead($object)
 
 	return $head;
 }
+
+
+function new_motDePasse($nbCar=8) 
+{
+    $collection = "azertyuiopsdfhjklmxcvbn";
+    $text = '';
+
+    $len = strlen($collection) - 1;
+
+    for($i=0; $i<$nbCar; $i++)  {
+        $index = rand(0, $len);
+        $text .= substr($collection, $index, 1);
+    }
+
+    return $text;
+}

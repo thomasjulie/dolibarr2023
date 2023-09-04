@@ -180,12 +180,12 @@ if (empty($reshook)) {
 if ($action == 'sendSms') {
 	$msg = GETPOST('msg');
 	
-	$selectRef = "SELECT ref FROM llx_actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+	$selectRef = "SELECT ref FROM " . $db->prefix() . "actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
 	$refReq = $db->query($selectRef);
 	$refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
 	$refLast++; // faire +1 à la dernière ref
 
-	$sql = "INSERT INTO llx_actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
+	$sql = "INSERT INTO " . $db->prefix() . "actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
 	VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 69, 'CRECHE_FAMILLE_SMS', 'SMS', '" 
 	. $db->escape($msg) . "', " . $object->id . ", 'famille')";
 	$req = $db->query($sql);
@@ -215,7 +215,7 @@ if ($object->id > 0) {
 	print dol_get_fiche_head($head, 'agenda', $langs->trans("Famille"), -1, $object->picto);
 
 	$sql = "SELECT id, ref, datep, datep2, code, label, note, fk_element, elementtype 
-			FROM llx_actioncomm 
+			FROM " . $db->prefix() . "actioncomm 
 			WHERE code LIKE '%CRECHE%' 
 			AND elementtype LIKE 'famille' 
 			AND fk_element = " . $object->id . " 
@@ -243,7 +243,7 @@ if ($object->id > 0) {
 				</tr>
 			</tbody>
 		</table>
-		<hr>
+		<!-- <hr> -->
 		<table class="tagtable liste">
 			<thead>
 				<tr class="liste_titre">

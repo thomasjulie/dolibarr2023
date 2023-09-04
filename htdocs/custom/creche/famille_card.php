@@ -96,6 +96,7 @@ $backtopage = GETPOST('backtopage', 'alpha');					// if not set, a default page 
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');	// if not set, $backtopage will be used
 $backtopagejsfields = GETPOST('backtopagejsfields', 'alpha');
 $dol_openinpopup = GETPOST('dol_openinpopup', 'aZ09');
+$entity = GETPOST('entity');
 
 if (!empty($backtopagejsfields)) {
 	$tmpbacktopagejsfields = explode(':', $backtopagejsfields);
@@ -305,6 +306,9 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatemin" value="'.date('i').'">';
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
+
+	print '<input type="hidden" name="entity" value="1">';
+
 	print dol_get_fiche_head(array(), '');
 
 	// Set some default values
@@ -318,6 +322,7 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	// unset($object->fields['entity']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
@@ -757,11 +762,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 					$moreparam .= '&'.($paramname2 ? $paramname2 : 'mid').'='.$paramval2;
 				}
 				
-				$selectRef = "SELECT ref FROM llx_actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+				$selectRef = "SELECT ref FROM " . $db->prefix() . "actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
 				$refReq = $db->query($selectRef);
 				$refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
 				$refLast++; // faire +1 à la dernière ref
-				$sql = "INSERT INTO llx_actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
+				$sql = "INSERT INTO " . $db->prefix() . "actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
 				VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 67, 'CRECHE_FAMILLE_MAIL', '" . $db->escape($subject) . "', '" 
 				. $db->escape($message) . "', " . $object->id . ", 'famille')";
 				$req = $db->query($sql);

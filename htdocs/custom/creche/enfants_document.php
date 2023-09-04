@@ -184,7 +184,7 @@ foreach ($filearray as $key => $file) {
 
 // Object card
 // ------------------------------------------------------------
-$linkback = '<a href="'.dol_buildpath('/creche/enfants_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+$linkback = '<a href="'.dol_buildpath('/creche/famille_enfants.php', 1).'?id=' . $object->fk_famille . '">'.$langs->trans("Retour à la famille").'</a>';
 
 $morehtmlref = '<div class="refidno">';
 /*
@@ -225,7 +225,7 @@ $morehtmlref = '<div class="refidno">';
  }*/
 $morehtmlref .= '</div>';
 
-dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 
 print '<div class="fichecenter">';
 

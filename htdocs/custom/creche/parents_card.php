@@ -103,6 +103,13 @@ if (!empty($backtopagejsfields)) {
 
 // Initialize technical objects
 $object = new Parents($db);
+$object->fields['tel_portable']['notnull'] = 0;
+$object->fields['mail']['notnull'] = 0;
+$object->fields['login']['notnull'] = 0;
+$object->fields['notif']['notnull'] = 0;
+$object->fields['mode_notif']['notnull'] = 0;
+$object->fields['mdp']['notnull'] = 0;
+$object->fields['rowid']['notnull'] = 0;
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->creche->dir_output.'/temp/massgeneration/'.$user->id;
 $hookmanager->initHooks(array($object->element.'card', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -294,6 +301,8 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatemin" value="'.date('i').'">';
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
+	print '<input type="hidden" name="mdp" value="' . dol_hash(new_motDePasse()) .'">';
+
 	print dol_get_fiche_head(array(), '');
 
 	// Set some default values
@@ -307,6 +316,7 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	// unset($object->fields['mdp']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
@@ -358,7 +368,8 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
-
+	unset($object->fields['mdp']);
+	// echo '<pre>';var_dump($object->fields, $object->element.'card');echo '</pre>';
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 
 	// Other attributes
@@ -431,7 +442,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/creche/parents_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/creche/famille_parents.php', 1).'?id=' . $object->fk_famille . '">'.$langs->trans("Retour à la famille").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	/*
@@ -597,42 +608,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// Select mail models is same action as presend
 	if (GETPOST('modelselected')) {
 		$action = 'presend';
-	}
-
-	if ($action != 'presend') {
-		print '<div class="fichecenter"><div class="fichehalfleft">';
-		print '<a name="builddoc"></a>'; // ancre
-
-		$includedocgeneration = 0;
-
-		// Documents
-		if ($includedocgeneration) {
-			$objref = dol_sanitizeFileName($object->ref);
-			$relativepath = $objref.'/'.$objref.'.pdf';
-			$filedir = $conf->creche->dir_output.'/'.$object->element.'/'.$objref;
-			$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
-			$genallowed = $permissiontoread; // If you can read, you can build the PDF to read content
-			$delallowed = $permissiontoadd; // If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('creche:Parents', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
-		}
-
-		// Show links to link elements
-		$linktoelem = $form->showLinkToObjectBlock($object, null, array('parents'));
-		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
-
-
-		print '</div><div class="fichehalfright">';
-
-		$MAXEVENT = 10;
-
-		$morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/creche/parents_agenda.php', 1).'?id='.$object->id);
-
-		// List of actions on element
-		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element.'@'.$object->module, (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlcenter);
-
-		print '</div></div>';
 	}
 
 	//Select mail models is same action as presend

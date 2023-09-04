@@ -137,10 +137,23 @@ if (!$sortorder) {
 
 // Initialize array of search criterias
 $search_all = trim(GETPOST('search_all', 'alphanohtml'));
+$search_fam = GETPOST('search_fk_famille', 'alpha');
 $search = array();
 foreach ($object->fields as $key => $val) {
 	if (GETPOST('search_'.$key, 'alpha') !== '') {
-		$search[$key] = GETPOST('search_'.$key, 'alpha');
+		if ($key  == 'fk_famille') {
+			$sql = "SELECT rowid  
+					FROM " . $db->prefix() . "creche_famille 
+					WHERE libelle LIKE '%" . $search_fam . "%'";
+			$req = $db->query($sql);
+			$tmp = array();
+			while ($row = $db->fetch_object($req)) {
+				$tmp[] = $row->rowid;
+			}
+			$search[$key] = implode('|', $tmp);
+		} else {
+			$search[$key] = GETPOST('search_'.$key, 'alpha');
+		}
 	}
 	if (preg_match('/^(date|timestamp|datetime)/', $val['type'])) {
 		$search[$key.'_dtstart'] = dol_mktime(0, 0, 0, GETPOST('search_'.$key.'_dtstartmonth', 'int'), GETPOST('search_'.$key.'_dtstartday', 'int'), GETPOST('search_'.$key.'_dtstartyear', 'int'));
@@ -243,6 +256,7 @@ if (empty($reshook)) {
 		}
 		$toselect = array();
 		$search_array_options = array();
+		$search_fam = '';
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
@@ -322,6 +336,9 @@ foreach ($search as $key => $val) {
 			$mode_search = 2;
 		}
 		if ($search[$key] != '') {
+			if ($key  == 'fk_famille') {
+				$mode_search = 0;
+			}
 			$sql .= natural_search("t.".$db->escape($key), $search[$key], (($key == 'status') ? 2 : $mode_search));
 		}
 	} else {
@@ -600,7 +617,12 @@ foreach ($object->fields as $key => $val) {
 			$formadmin = new FormAdmin($db);
 			print $formadmin->select_language($search[$key], 'search_lang', 0, null, 1, 0, 0, 'minwidth150 maxwidth200', 2);
 		} else {
-			print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag(isset($search[$key]) ? $search[$key] : '').'">';
+			if ($key == 'fk_famille') {
+				$inputValue = $search_fam;
+			} else {
+				$inputValue = isset($search[$key]) ? $search[$key] : '';
+			}
+			print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag($inputValue).'">';
 		}
 		print '</td>';
 	}
@@ -764,7 +786,10 @@ while ($i < $imaxinloop) {
 				} elseif ($key == 'rowid') {
 					print $object->showOutputField($val, $key, $object->id, '');
 				} else {
-					print $object->showOutputField($val, $key, $object->$key, '');
+					$reshook = $hookmanager->executeHooks('showFieldValue', array('field' => $key, 'type' => $val['type'], 'value' => $object->$key));
+					if (empty($reshook)) {
+						print $object->showOutputField($val, $key, $object->$key, '');
+					}
 				}
 				print '</td>';
 				if (!$i) {

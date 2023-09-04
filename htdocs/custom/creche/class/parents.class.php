@@ -114,9 +114,9 @@ class Parents extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
+		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1,),
 		'fk_famille' => array('type'=>'int', 'label'=>'Fkfamille', 'enabled'=>'1', 'position'=>15, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx',),
-		'civilite' => array('type'=>'varchar(10)', 'label'=>'Civilite', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-1,),
+		'civilite' => array('type'=>'enum("m", "mme")', 'label'=>'Civilite', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-1,),
 		'nom' => array('type'=>'varchar(150)', 'label'=>'Nom', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>-1,),
 		'prenom' => array('type'=>'varchar(150)', 'label'=>'Prenom', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1,),
 		'adresse' => array('type'=>'varchar(250)', 'label'=>'Adresse', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>-1,),
@@ -125,13 +125,13 @@ class Parents extends CommonObject
 		'tel_portable' => array('type'=>'varchar(20)', 'label'=>'Telportable', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
 		'mail' => array('type'=>'varchar(150)', 'label'=>'Mail', 'enabled'=>'1', 'position'=>55, 'notnull'=>1, 'visible'=>-1,),
 		'login' => array('type'=>'varchar(100)', 'label'=>'Login', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>-1,),
-		'mdp' => array('type'=>'varchar(150)', 'label'=>'Mdp', 'enabled'=>'1', 'position'=>65, 'notnull'=>1, 'visible'=>-1,),
-		'notif' => array('type'=>'integer', 'label'=>'Notif', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'visible'=>-1,),
-		'mode_notif' => array('type'=>'varchar(150)', 'label'=>'Modenotif', 'enabled'=>'1', 'position'=>75, 'notnull'=>1, 'visible'=>-1,),
-		'fk_user_create' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkusercreate', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
-		'date_create' => array('type'=>'datetime', 'label'=>'Datecreate', 'enabled'=>'1', 'position'=>85, 'notnull'=>1, 'visible'=>-1,),
-		'fk_user_update' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkuserupdate', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
-		'date_update' => array('type'=>'datetime', 'label'=>'Dateupdate', 'enabled'=>'1', 'position'=>95, 'notnull'=>1, 'visible'=>-1,),
+		'mdp' => array('type'=>'varchar(150)', 'label'=>'Mdp', 'enabled'=>'1', 'position'=>65, 'notnull'=>1, 'visible'=>0,),
+		'notif' => array('type'=>'tinyint(1)', 'label'=>'Notif', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>-1,),
+		'mode_notif' => array('type'=>'enum("mail","sms")', 'label'=>'Modenotif', 'enabled'=>'1', 'position'=>75, 'notnull'=>0, 'visible'=>-1,),
+		'fk_user_create' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkusercreate', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>0, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
+		'date_create' => array('type'=>'datetime', 'label'=>'Datecreate', 'enabled'=>'1', 'position'=>85, 'notnull'=>1, 'visible'=>0,),
+		'fk_user_update' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkuserupdate', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>0, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
+		'date_update' => array('type'=>'datetime', 'label'=>'Dateupdate', 'enabled'=>'1', 'position'=>95, 'notnull'=>1, 'visible'=>0,),
 	);
 	public $rowid;
 	public $fk_famille;
