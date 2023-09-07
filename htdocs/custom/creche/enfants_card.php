@@ -310,6 +310,7 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	unset($object->fields['code_facture']);
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
 	// Other attributes
@@ -360,6 +361,7 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	unset($object->fields['code_facture']);
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 
 	// Other attributes
@@ -379,6 +381,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$head = enfantsPrepareHead($object);
 
 	print dol_get_fiche_head($head, 'card', $langs->trans("Enfants"), -1, $object->picto, 0, '', '', 0, '', 1);
+
+	if ($object->code_facture != null || $object->code_facture == '') {
+		$code = '90';
+		$code .= strtoupper(preg_replace("/[^a-zA-Z]/", "", $object->nom));
+		$code .= '-' . $object->id;
+		$sql = "UPDATE " . $db->prefix() . "creche_enfants 
+		SET code_facture = '" . $code . "' 
+		WHERE rowid = " . $object->id;
+		$req = $db->query($sql);
+		$object->code_facture = $code;
+	}
 
 	$formconfirm = '';
 

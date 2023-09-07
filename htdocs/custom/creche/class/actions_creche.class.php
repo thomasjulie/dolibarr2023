@@ -196,29 +196,6 @@ class ActionsCreche extends CommonHookActions
 					$out = '<input type="file" name="photo_id" id="photo_id" accept="image/*" />';
 					echo $out;
 					return 1;
-				} elseif ($parameters['field'] == 'code_facture') {
-					// Code facture enfant : CR_{libellé famille}_{rowid enfant}
-					$mask = empty($conf->global->CRECHE_MASK_FACT) ? 'CR_F_E' : $conf->global->CRECHE_MASK_FACT;
-					if ($parameters['value'] != null && $parameters['value'] != '') {
-						$code = $parameters['value'];
-					} else {
-						$sql = "SHOW TABLE STATUS LIKE '" . $this->db->prefix() . "creche_enfants'";
-						$req = $this->db->query($sql);
-						$id = $this->db->fetch_object($req)->Auto_increment;
-
-						$famid = GETPOST('famid');
-						$sql = "SELECT libelle 
-						FROM " . $this->db->prefix() . "creche_famille 
-						WHERE rowid = " . $famid;
-						$req = $this->db->query($sql);
-						$famille = $this->db->fetch_object($req);
-						$code = str_replace('F', $famille->libelle, $mask);
-						$code = str_replace('E', $id, $code);
-					}
-					
-					$out = '<input type="text" name="code_facture" id="code_facture" value="' . $code . '" />';
-					echo $out;
-					return 1;
 				}
 				
 			}
