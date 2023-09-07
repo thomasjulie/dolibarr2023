@@ -272,7 +272,7 @@ class ActionsCreche extends CommonHookActions
 					echo $out;
 					return 1;
 				} elseif (strpos($parameters['type'], 'enum') !== false) {
-					echo ucfirst($parameters['value']);
+					echo $langs->trans(ucfirst($parameters['value']));
 					return 1;
 				}
 				
@@ -350,12 +350,18 @@ class ActionsCreche extends CommonHookActions
 							WHERE rowid = " . $parameters['rowid'];
 					$req = $this->db->query($sql);
 					$obj = $this->db->fetch_object($req);
-					$parts = explode('/', $obj->photo_id);
-					$file = $parts[2] . '#' . $parts[3] . '#' . $parts[4];
+					
+					if ($obj->photo_id == null) {
+						$element = '<span class="fa fa-file" style="" title="No photo"></span>';
+					} else {
+						$parts = explode('/', $obj->photo_id);
+						$file = $parts[2] . '#' . $parts[3] . '#' . $parts[4];
+						$element = '<img src="viewimage.php?modulepart=creche&file=' 
+						. urlencode($file) . '&entity=1" style="max-width: 150px;height: auto;">';
+					}
 
 					$object .= '<div class="floatleft inline-block valignmiddle divphotoref"><div class="photoref">';
-					$object .= '<img src="viewimage.php?modulepart=creche&file=' 
-					. urlencode($file) . '&entity=1" style="max-width: 150px;height: auto;">';
+					$object .= $element;
 					$object .= '</div></div>';
 					
 					return 1;

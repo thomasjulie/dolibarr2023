@@ -188,7 +188,7 @@ if (empty($reshook)) {
 	$triggermodname = 'CRECHE_MYOBJECT_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	if (isset($_FILES['photo_id'])) {
+	if (isset($_FILES['photo_id']) && $_FILES['photo_id']['name'] != '') {
 		$_POST['photo_id'] = 'inputFileCreche';
 	}
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
