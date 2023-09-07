@@ -192,7 +192,41 @@ if (empty($reshook)) {
 	$triggermodname = 'CRECHE_MYOBJECT_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	
+	// controle que tel et mail n'existe pas déjà dans la table llx_creche_famille
+	$mail = GETPOST('mail');
+	$tel = GETPOST('tel_portable');
+	$submit = GETPOST('add');
+	$msg = '';
+	
+	if ($submit != '') {
+		if ($mail != '') {
+			$sql = "SELECT mail 
+			FROM " . $db->prefix() . "creche_famille 
+			WHERE mail = '" . $mail . "'";
+			$req = $db->query($sql);
+			if ($db->num_rows($req) > 0) {
+				$msg = 'E-mail déjà utilisé';
+			}
+		}
+		
+		if ($tel != '') {
+			$sql = "SELECT mail 
+			FROM " . $db->prefix() . "creche_famille 
+			WHERE tel_portable = '" . $tel . "'";
+			$req = $db->query($sql);
+			if ($db->num_rows($req) > 0) {
+				$msg = 'Numéro de téléphone déjà utilisé';
+			}
+		}
+	}
+	
+	if ($msg != '') {
+		setEventMessages($msg, null, 'errors');
+		$action = 'create';
+	} else {
+		include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	}
 
 	// Actions when linking object each other
 	include DOL_DOCUMENT_ROOT.'/core/actions_dellink.inc.php';
@@ -627,42 +661,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		$action = 'presend';
 	}
 
-	if ($action != 'presend') {
-		// print '<div class="fichecenter"><div class="fichehalfleft">';
-		// print '<a name="builddoc"></a>'; // ancre
-
-		// $includedocgeneration = 0;
-
-		// // Documents
-		// if ($includedocgeneration) {
-		// 	$objref = dol_sanitizeFileName($object->ref);
-		// 	$relativepath = $objref.'/'.$objref.'.pdf';
-		// 	$filedir = $conf->creche->dir_output.'/'.$object->element.'/'.$objref;
-		// 	$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
-		// 	$genallowed = $permissiontoread; // If you can read, you can build the PDF to read content
-		// 	$delallowed = $permissiontoadd; // If you can create/edit, you can remove a file on card
-		// 	print $formfile->showdocuments('creche:Famille', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
-		// }
-
-		// // Show links to link elements
-		// $linktoelem = $form->showLinkToObjectBlock($object, null, array('famille'));
-		// $somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
-
-
-		// print '</div><div class="fichehalfright">';
-
-		// $MAXEVENT = 10;
-
-		// $morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/creche/famille_agenda.php', 1).'?id='.$object->id);
-
-		// // List of actions on element
-		// include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-		// $formactions = new FormActions($db);
-		// $somethingshown = $formactions->showactions($object, $object->element.'@'.$object->module, (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlcenter);
-
-		// print '</div></div>';
-	}
-
 	//Select mail models is same action as presend
 	if (GETPOST('modelselected')) {
 		$action = 'presend';
@@ -770,9 +768,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 67, 'CRECHE_FAMILLE_MAIL', '" . $db->escape($subject) . "', '" 
 				. $db->escape($message) . "', " . $object->id . ", 'famille')";
 				$req = $db->query($sql);
-
-				header('Location: '.$_SERVER["PHP_SELF"].'?'.($paramname ? $paramname : 'id').'='.(is_object($object) ? $object->id : '').$moreparam);
-				exit;
 			} else {
 				$langs->load("other");
 				$mesg = '<div class="error">';

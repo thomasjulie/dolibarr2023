@@ -214,7 +214,7 @@ if ($object->id > 0) {
 
 	print dol_get_fiche_head($head, 'agenda', $langs->trans("Famille"), -1, $object->picto);
 
-	$sql = "SELECT id, ref, datep, datep2, code, label, note, fk_element, elementtype 
+	$sql = "SELECT id, ref, datep, datep2, code, label, note, fk_element, elementtype, extraparams 
 			FROM " . $db->prefix() . "actioncomm 
 			WHERE code LIKE '%CRECHE%' 
 			AND elementtype LIKE 'famille' 
@@ -249,13 +249,26 @@ if ($object->id > 0) {
 				<tr class="liste_titre">
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Titre") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Description") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Enfant") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Début") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Fin") ?></th>
 				</tr>
 			</thead>
 			<tbody>
-				<?php while ($res = $db->fetch_object($req)): ?>
+				<?php while ($res = $db->fetch_object($req)): 
+					if ($res->extraparams != null && strpos($res->extraparams, 'enfant') !== false) {
+						$parts = explode(':', $res->extraparams);
+						$sql2 = "SELECT prenom 
+						FROM " . $db->prefix() . "creche_enfants 
+						WHERE rowid = " . $parts[1];
+						$req2 = $db->query($sql2);
+						$enfant = $db->fetch_object($req2);
+						$prenom = $enfant->prenom;
+					} else {
+						$prenom = '-';
+					}
+					?>
 					<tr>
 						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
 							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
@@ -263,6 +276,9 @@ if ($object->id > 0) {
 						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
 							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
 							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->note ?></td>
+						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
+							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $prenom ?></td>
 						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
 							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
 							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>">

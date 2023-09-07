@@ -26,6 +26,7 @@ CREATE TABLE llx_creche_enfants(
 	droit_image tinyint(1) NOT NULL, 
 	infos_divers text, 
 	photo_id varchar(250), 
+	code_facture varchar(150), 
 	fk_user_create integer NOT NULL, 
 	date_create datetime NOT NULL, 
 	fk_user_update integer NOT NULL, 

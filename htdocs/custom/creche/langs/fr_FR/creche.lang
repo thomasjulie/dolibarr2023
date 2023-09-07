@@ -54,6 +54,7 @@ MyWidget = My widget
 MyWidgetDescription = My widget description
 Create = Créer
 
+MailSuccessfulySent = E-mail (de %s vers %s) accepté pour expédition
 
 
 ModuleCrecheName = Crèche   
@@ -72,3 +73,4 @@ Datenaissance = Date de naissance
 Droitimage = Droit à l'image
 Infosdivers = Infos divers
 Photoid = Photo d'identité
+CodeFacture = Code facture

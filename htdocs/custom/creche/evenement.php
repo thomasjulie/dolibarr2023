@@ -49,6 +49,7 @@ $action = GETPOST('action', 'aZ09');
 $actioncode = GETPOST('actioncode');
 $label = GETPOST('label');
 $description = GETPOST('note');
+$child = GETPOST('child', 'int');
 
 // Initialize technical objects
 $object = new Famille($db);
@@ -79,18 +80,39 @@ if (!$permissiontoread) accessforbidden();
 
 
 if ($action == 'add') {
-    $selectRef = "SELECT ref FROM llx_actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+    $sql = "SHOW TABLE STATUS LIKE '" . $db->prefix() . "actioncomm'";
+    $req = $db->query($sql);
+    $id = $db->fetch_object($req)->Auto_increment;
+    
+    if (isset($_FILES['attached_file'])) {
+        if (!file_exists('../../../documents/agenda/' . $id)) {
+            mkdir('../../../documents/agenda/' . $id, 0777, true);
+        }
+        $dossier = '../../../documents/agenda/' . $id . '/';
+        $fichier = basename($_FILES['attached_file']['name']);
+        $move = move_uploaded_file($_FILES['attached_file']['tmp_name'], $dossier . $fichier);
+    }
+
+    $selectRef = "SELECT ref FROM " . $db->prefix() . "actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
     $refReq = $db->query($selectRef);
     $refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
     $refLast++; // faire +1 à la dernière ref
-
-    $selectCode = "SELECT id FROM llx_c_actioncomm WHERE code = '" . $actioncode . "'";
+    
+    $selectCode = "SELECT id FROM " . $db->prefix() . "c_actioncomm WHERE code = '" . $actioncode . "'";
     $codeReq = $db->query($selectCode);
     $actionCodeId = $db->fetch_object($codeReq)->id;
-
-    $sql = "INSERT INTO llx_actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
-    VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', " . $actionCodeId . ", '" . $actioncode . "', '" . $db->escape($label) . "', '" 
-    . $db->escape($description) . "', " . $famid . ", 'famille')";
+    
+    $extraparams = '';
+    $extraparamsField = '';
+    if ($child != 0) {
+        $extraparams = 'enfant:' . $child;
+        $extraparamsField = 'extraparams';
+    }
+    
+    $sql = "INSERT INTO " . $db->prefix() . "actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype" . 
+        ($extraparams != '' ? ", extraparams" : "") .") 
+        VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', " . $actionCodeId . ", '" . $actioncode . "', '" . $db->escape($label) 
+        . "', '" . $db->escape($description) . "', " . $famid . ", 'famille'" . ($extraparams != '' ? ", '$extraparams'" : "") .")";
     $req = $db->query($sql);
     header('Location: famille_agenda.php?id=' . $famid);
     exit;
@@ -103,6 +125,11 @@ llxHeader('', $title, $help_url);
 
 $form = new Form($db);
 $formactions = new FormActions($db);
+
+$sql = "SELECT rowid, prenom 
+        FROM " . $db->prefix() . "creche_enfants 
+        WHERE fk_famille = " . $famid;
+$enfants = $db->query($sql);
 
 dol_set_focus("#label");
 
@@ -162,7 +189,7 @@ if (!empty($conf->use_javascript_ajax)) {
     print '</script>'."\n";
 }
 
-print '<form name="formaction" action="'.$_SERVER['PHP_SELF'].'?famid=' . $famid . '" method="POST">';
+print '<form name="formaction" action="'.$_SERVER['PHP_SELF'].'?famid=' . $famid . '" method="POST" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="add">';
 print '<input type="hidden" name="donotclearsession" value="1">';
@@ -211,6 +238,16 @@ if (!empty($conf->global->AGENDA_USE_EVENT_TYPE)) {
     print '</td></tr>';
 }
 
+// Enfant
+print '<tr><td class="nowrap">'.$langs->trans("Enfant concerné").'</td><td>';
+print '<select name="child" id="child" class="">';
+print '<option value="0"></option>';
+while ($enfant = $db->fetch_object($enfants)) {
+    print '<option value="' . $enfant->rowid . '">' . $enfant->prenom . '</option>';
+}
+print '</select>';
+print '</td></tr>';
+
 // Title
 print '<tr><td'.(empty($conf->global->AGENDA_USE_EVENT_TYPE) ? ' class="fieldrequired titlefieldcreate"' : '').'>'.$langs->trans("Label").'</td><td><input type="text" id="label" name="label" class="soixantepercent" value="'.GETPOST('label').'"></td></tr>';
 
@@ -227,6 +264,11 @@ print '</td><td>';
 print $form->selectDate($datep, 'ap', 1, 1, 1, "action", 1, 2, 0, 'fulldaystart', '', '', '', 1, '', '', 'tzuserrel');
 print ' <span class="hideonsmartphone">&nbsp; &nbsp; - &nbsp; &nbsp;</span> ';
 print $form->selectDate($datef, 'p2', 1, 1, 1, "action", 1, 0, 0, 'fulldayend', '', '', '', 1, '', '', 'tzuserrel');
+print '</td></tr>';
+
+// Joindre un fichier
+print '<tr><td class="nowrap">'.$langs->trans("Joindre un fichier").'</td>';
+print '<td><input type="file" name="attached_file" id="attached_file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" />';
 print '</td></tr>';
 print '</table>';
 

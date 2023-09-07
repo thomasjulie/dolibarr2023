@@ -124,6 +124,7 @@ class Enfants extends CommonObject
 		'droit_image' => array('type'=>'tinyint(1)', 'label'=>'Droitimage', 'enabled'=>'1', 'position'=>45, 'notnull'=>1, 'visible'=>-1,),
 		'infos_divers' => array('type'=>'text', 'label'=>'Infosdivers', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
 		'photo_id' => array('type'=>'varchar(250)', 'label'=>'Photoid', 'enabled'=>'1', 'position'=>55, 'notnull'=>0, 'visible'=>-1,),
+		'code_facture' => array('type'=>'varchar(150)', 'label'=>'CodeFacture', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>-1,),
 		'fk_user_create' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkusercreate', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
 		'date_create' => array('type'=>'datetime', 'label'=>'Datecreate', 'enabled'=>'1', 'position'=>65, 'notnull'=>1, 'visible'=>-1,),
 		'fk_user_update' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkuserupdate', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
@@ -139,6 +140,7 @@ class Enfants extends CommonObject
 	public $droit_image;
 	public $infos_divers;
 	public $photo_id;
+	public $code_facture;
 	public $fk_user_create;
 	public $date_create;
 	public $fk_user_update;

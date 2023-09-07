@@ -226,7 +226,7 @@ if ($modulepart === 'medias' && $entity != $conf->entity) {
 	$conf->setValues($db);
 }
 
-$parts = explode('_', $original_file);
+$parts = explode('#', $original_file);
 $typeObject = $parts[0];
 $partialPath = implode('/', $parts);
 
@@ -238,7 +238,7 @@ $check_access = array(
 $accessallowed              = $check_access['accessallowed'];
 $sqlprotectagainstexternals = $check_access['sqlprotectagainstexternals'];
 $fullpath_original_file     = $check_access['original_file']; // $fullpath_original_file is now a full path name
-// echo '<pre>';var_dump($check_access, $user->rights->creche->enfants->read);echo '</pre>';die;
+// echo '<pre>';var_dump($parts, $check_access, $user->rights->creche->enfants->read);echo '</pre>';die;
 if (!empty($hashp)) {
 	$accessallowed = 1; // When using hashp, link is public so we force $accessallowed
 	$sqlprotectagainstexternals = '';
