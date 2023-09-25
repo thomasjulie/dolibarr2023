@@ -75,3 +75,7 @@ Infosdivers = Infos divers
 Photoid = Photo d'identité
 CodeFacture = Code facture
 Garcon = Garçon
+Fkusercreate = Auteur
+Datecreate = Date de création
+Fkuserupdate = Modification
+Dateupdate = Date de modification

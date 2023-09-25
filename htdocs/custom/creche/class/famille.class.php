@@ -52,7 +52,7 @@ class Famille extends CommonObject
 	 * @var int  	Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -127,6 +127,7 @@ class Famille extends CommonObject
 	public $libelle;
 	public $mail;
 	public $tel_portable;
+	public $entity;
 	public $fk_user_create;
 	public $date_create;
 	public $fk_user_update;

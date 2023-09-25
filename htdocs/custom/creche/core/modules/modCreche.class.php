@@ -118,7 +118,8 @@ class modCreche extends DolibarrModules
 				'parentscard',
 				'crecheparentslist',
 				'enfantscard',
-				'enfantsdocument'
+				'enfantsdocument',
+				'crecheenfantslist'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',
@@ -628,6 +629,67 @@ class modCreche extends DolibarrModules
 			}
 		}
 
+		$params = array(
+			'creche' => array(
+				'sharingelements' => array(				// section des paramètres 'element' et 'object'
+					'famille' => array(		// Valeur utilisée dans getEntity()
+						'type' => 'object',
+						'input' => array(
+							'global' => array(
+								'showhide' => true,
+								'hide' => true,
+								'del' => true
+							)
+						)
+					),
+					'parents' => array(			// Valeur utilisée dans getEntity()
+						'type' => 'object',
+						'input' => array(
+							'global' => array(
+								'showhide' => true,
+								'hide' => true,
+								'del' => true
+							)
+						)
+					),
+					'enfants' => array(			// Valeur utilisée dans getEntity()
+						'type' => 'object',
+						'input' => array(
+							'global' => array(
+								'showhide' => true,
+								'hide' => true,
+								'del' => true
+							)
+						)
+					)
+				),
+				'sharingmodulename' => array(			// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
+					'famille' => 'creche',
+					'parents' => 'creche',
+					'enfants' => 'creche',
+				),
+			)
+		);
+	
+		/* sharingelements
+		$params = array(
+			'creche' => array(
+				'type' => 'element'
+			)
+		);
+		*/
+		
+		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+		if( is_null($externalmodule) )	$externalmodule = array();
+        $externalmodule = array_merge($externalmodule, $params);
+// echo '<pre>';
+// var_dump( $externalmodule );
+// echo '</pre>';
+
+		$jsonformat = json_encode($externalmodule);
+// exit;
+        dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat);
+
 		return $this->_init($sql, $options);
 	}
 
@@ -641,6 +703,11 @@ class modCreche extends DolibarrModules
 	 */
 	public function remove($options = '')
 	{
+		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+		unset($externalmodule['Creche']); // nom informatif du module externe qui apporte ses paramètres
+		$jsonformat = json_encode($externalmodule);
+		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat);
+
 		$sql = array();
 		return $this->_remove($sql, $options);
 	}

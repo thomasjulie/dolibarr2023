@@ -220,7 +220,7 @@ class ActionsCreche extends CommonHookActions
 		// echo '<pre>';var_dump($parameters);echo '</pre>';
 		
 		$error = 0; // Error counter
-		if (in_array($parameters['currentcontext'], array('parentscard', 'crecheparentslist', 'enfantscard'))) { 
+		if (in_array($parameters['currentcontext'], array('parentscard', 'crecheparentslist', 'enfantscard', 'crecheenfantslist'))) { 
 			if ($conf->creche->enabled) {
 				if (in_array($parameters['field'], $this->booleanFields)) {
 					if ($parameters['value'] == 1) {
@@ -238,7 +238,7 @@ class ActionsCreche extends CommonHookActions
 					$req = $this->db->query($sql);
 					$obj = $this->db->fetch_object($req);
 					
-					if ($parameters['currentcontext'] == 'crecheparentslist') {
+					if (in_array($parameters['currentcontext'], array('crecheparentslist', 'crecheenfantslist'))) {
 						$out = ucfirst($obj->libelle);
 					} else {
 						$out = '<a href="/custom/creche/famille_card.php?id=' 
