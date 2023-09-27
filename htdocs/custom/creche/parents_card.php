@@ -76,6 +76,7 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche.lib.php';
 dol_include_once('/creche/class/parents.class.php');
 dol_include_once('/creche/lib/creche_parents.lib.php');
 
@@ -195,7 +196,43 @@ if (empty($reshook)) {
 	$triggermodname = 'CRECHE_MYOBJECT_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	
+	$mail = GETPOST('mail');
+	$tel = GETPOST('tel_portable');
+	$submit = (GETPOST('add') != '') ? 'add' : 'save';
+	$msg = '';
+
+	if (in_array($action, array('update', 'add'))) {
+		if (GETPOST('cancel') == '') { //Ne pas controller si on clic sur Annuler
+			if ($mail != '') {
+				if (!validateEmail($mail)) {
+					if ($msg != '') {
+						$msg .= "<br />";
+					}
+					$msg .= 'Veuillez renseigner un e-mail valide';
+				}
+			}
+			
+			if ($tel != '') {
+				if(!validateMobilePhone($tel)){
+					if ($msg != '') {
+						$msg .= "<br />";
+					}
+					$msg .= 'Veuillez renseigner un numéro de téléphone portable valide (doit être composé de 10 chiffres ou 9 si utilisation de +33)';
+				}
+			}
+			// die;
+		}
+	}
+	
+	if ($msg != '') {
+		setEventMessages($msg, null, 'errors');
+		$action = ($submit == 'add') ? 'create' : 'edit';
+	} else {
+		include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	}
+	
+	// include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
 	// Actions when linking object each other
 	include DOL_DOCUMENT_ROOT.'/core/actions_dellink.inc.php';
@@ -302,6 +339,7 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
 	print '<input type="hidden" name="mdp" value="' . dol_hash(new_motDePasse()) .'">';
+	print '<input type="hidden" name="entity" value="' . getEntity('parents', 0) . '">';
 
 	print dol_get_fiche_head(array(), '');
 
@@ -316,6 +354,7 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	unset($object->fields['entity']);
 	// unset($object->fields['mdp']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';

@@ -74,3 +74,19 @@ function crecheAdminPrepareHead()
 
 	return $head;
 }
+
+/**
+ * Controle e-mail
+ */
+function validateEmail($mail)
+{
+	return filter_var($mail, FILTER_VALIDATE_EMAIL);
+}
+
+/**
+ * Controle téléphone protable
+ */
+function validateMobilePhone($phone)
+{
+	return preg_match("#^(\+33|0)[67][0-9]{8}$#", $phone);
+}

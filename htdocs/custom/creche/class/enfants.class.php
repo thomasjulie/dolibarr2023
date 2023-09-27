@@ -52,7 +52,7 @@ class Enfants extends CommonObject
 	 * @var int  	Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -116,6 +116,7 @@ class Enfants extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
 		'fk_famille' => array('type'=>'int', 'label'=>'Fkfamille', 'enabled'=>'1', 'position'=>15, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx',),
+		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>16, 'notnull'=>1, 'visible'=>-1,),
 		'genre' => array('type'=>'enum("fille","garcon")', 'label'=>'Genre', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-1,),
 		'nom' => array('type'=>'varchar(150)', 'label'=>'Nom', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>-1,),
 		'prenom' => array('type'=>'varchar(150)', 'label'=>'Prenom', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1,),
@@ -132,6 +133,7 @@ class Enfants extends CommonObject
 	);
 	public $rowid;
 	public $fk_famille;
+	public $entity;
 	public $genre;
 	public $nom;
 	public $prenom;

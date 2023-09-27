@@ -132,10 +132,10 @@ class ActionsCreche extends CommonHookActions
 	{
 		global $conf, $user, $langs;
 		
-		// echo '<pre>';var_dump('showField', $action, GETPOST('famid', 'int') > 0, $parameters);echo '</pre>';
+		// echo '<pre>';var_dump('showField', $parameters);echo '</pre>';
 		
 		$error = 0; // Error counter
-		if (in_array($parameters['currentcontext'], array('parentscard', 'enfantscard'))) { 
+		if (in_array($parameters['currentcontext'], array('parentscard', 'enfantscard', 'famillecard'))) { 
 			if ($conf->creche->enabled) {
 				if (strpos($parameters['type'], 'enum') !== false) {
 					$tmp = explode('(', $parameters['type']);
@@ -194,6 +194,12 @@ class ActionsCreche extends CommonHookActions
 					return 1;
 				} elseif ($parameters['field'] == 'photo_id') {
 					$out = '<input type="file" name="photo_id" id="photo_id" accept="image/*" />';
+					echo $out;
+					return 1;
+				} elseif ($parameters['field'] == 'mail') {
+					$value = ($parameters['value'] != '') ? $parameters['value'] : '';
+					$out = '<input type="email" class="flat minwidth400 --success" name="mail" id="mail" 
+					maxlength="150" value="' . $value . '">';
 					echo $out;
 					return 1;
 				}

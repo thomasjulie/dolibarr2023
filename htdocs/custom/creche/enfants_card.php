@@ -229,7 +229,7 @@ if (empty($reshook)) {
 $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
-
+// var_dump(getEntity('enfants', 0));
 $title = $langs->trans("Enfants")." - ".$langs->trans('Card');
 //$title = $object->ref." - ".$langs->trans('Card');
 if ($action == 'create') {
@@ -297,6 +297,8 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatemin" value="'.date('i').'">';
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
+	print '<input type="hidden" name="entity" value="' . getEntity('enfants', 0) . '">';
+
 	print dol_get_fiche_head(array(), '');
 
 	// Set some default values
@@ -311,6 +313,7 @@ if ($action == 'create') {
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
 	unset($object->fields['code_facture']);
+	unset($object->fields['entity']);
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
 	// Other attributes

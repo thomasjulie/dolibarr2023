@@ -196,17 +196,20 @@ if (empty($reshook)) {
 	// controle que tel et mail n'existe pas déjà dans la table llx_creche_famille
 	$mail = GETPOST('mail');
 	$tel = GETPOST('tel_portable');
-	$submit = GETPOST('add');
+	$submit = (GETPOST('add') != '') ? 'add' : 'save';
 	$msg = '';
 	
-	if ($submit != '') {
+	if ($submit == 'add') {
 		if ($mail != '') {
 			$sql = "SELECT mail 
 			FROM " . $db->prefix() . "creche_famille 
 			WHERE mail = '" . $mail . "'";
 			$req = $db->query($sql);
 			if ($db->num_rows($req) > 0) {
-				$msg = 'E-mail déjà utilisé';
+				if ($msg != '') {
+					$msg .= "<br />";
+				}
+				$msg .= 'E-mail déjà utilisé';
 			}
 		}
 		
@@ -216,14 +219,40 @@ if (empty($reshook)) {
 			WHERE tel_portable = '" . $tel . "'";
 			$req = $db->query($sql);
 			if ($db->num_rows($req) > 0) {
-				$msg = 'Numéro de téléphone déjà utilisé';
+				if ($msg != '') {
+					$msg .= "<br />";
+				}
+				$msg .= 'Numéro de téléphone déjà utilisé';
 			}
+		}
+	} 
+
+	if (in_array($action, array('update', 'add'))) {
+		if (GETPOST('cancel') == '') { //Ne pas controller si on clic sur Annuler
+			if ($mail != '') {
+				if (!validateEmail($mail)) {
+					if ($msg != '') {
+						$msg .= "<br />";
+					}
+					$msg .= 'Veuillez renseigner un e-mail valide';
+				}
+			}
+			
+			if ($tel != '') {
+				if(!validateMobilePhone($tel)){
+					if ($msg != '') {
+						$msg .= "<br />";
+					}
+					$msg .= 'Veuillez renseigner un numéro de téléphone portable valide (doit être composé de 10 chiffres ou 9 si utilisation de +33)';
+				}
+			}
+			// die;
 		}
 	}
 	
 	if ($msg != '') {
 		setEventMessages($msg, null, 'errors');
-		$action = 'create';
+		$action = ($submit == 'add') ? 'create' : 'edit';
 	} else {
 		include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 	}
@@ -341,7 +370,7 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
 
-	print '<input type="hidden" name="entity" value="1">';
+	print '<input type="hidden" name="entity" value="' . getEntity('famille', 0) . '">';
 
 	print dol_get_fiche_head(array(), '');
 
@@ -356,6 +385,7 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	unset($object->fields['entity']);
 	// unset($object->fields['entity']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
