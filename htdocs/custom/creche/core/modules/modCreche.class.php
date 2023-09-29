@@ -100,7 +100,7 @@ class modCreche extends DolibarrModules
 			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 			'barcode' => 0,
 			// Set this to 1 if module has its own models directory (core/modules/xxx)
-			'models' => 0,
+			'models' => 1,
 			// Set this to 1 if module has its own printing directory (core/modules/printing)
 			'printing' => 0,
 			// Set this to 1 if module has its own theme directory (theme)
@@ -120,7 +120,8 @@ class modCreche extends DolibarrModules
 				'enfantscard',
 				'enfantsdocument',
 				'crecheenfantslist',
-				'famillecard'
+				'famillecard',
+				'enfants_contrats'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',
@@ -326,6 +327,21 @@ class modCreche extends DolibarrModules
 		$this->rights[$r][4] = 'enfants';
 		$this->rights[$r][5] = 'delete';
 		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (3 * 10) + 0 + 1);
+		$this->rights[$r][1] = 'Read Contrats object of Creche';
+		$this->rights[$r][4] = 'contrats';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (3 * 10) + 1 + 1);
+		$this->rights[$r][1] = 'Create/Update Contrats object of Creche';
+		$this->rights[$r][4] = 'contrats';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (3 * 10) + 2 + 1);
+		$this->rights[$r][1] = 'Delete Contrats object of Creche';
+		$this->rights[$r][4] = 'contrats';
+		$this->rights[$r][5] = 'delete';
+		$r++;
 		
 		/* END MODULEBUILDER PERMISSIONS */
 
@@ -367,7 +383,7 @@ class modCreche extends DolibarrModules
 			 'user' =>2,
 		);
 		/* END LEFTMENU PARENTS */
-		/* LEFTMENU LIST PARENTS */
+		/* LEFTMENU LISTE PARENTS */
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=parents',
 			 'type' =>'left',
@@ -382,23 +398,7 @@ class modCreche extends DolibarrModules
 			 'target' =>'',
 			 'user' =>2,
 		);
-		/* END LEFTMENU LIST PARENTS */
-		/* LEFTMENU NEW PARENTS */
-// 		$this->menu[$r++]=array(
-// 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=parents',
-// 			 'type' =>'left',
-// 			 'titre' =>'Nouveau Parent',
-// 			 'mainmenu' =>'creche',
-// 			 'leftmenu' =>'creche_parents_new',
-// 			 'url' =>'/creche/parents_card.php?action=create',
-// 			 'langs' =>'creche@creche',
-// 			 'position' =>1000 + $r,
-// 			 'enabled' =>'$conf->creche->enabled',
-// 			 'perms' =>'$user->hasRight("creche", "parents", "write")',
-// 			 'target' =>'',
-// 			 'user' =>2,
-// 		);
-		/* END LEFTMENU NEW PARENTS */
+		/* END LEFTMENU LISTE PARENTS */
 		/* LEFTMENU FAMILLE */
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche',
@@ -415,7 +415,7 @@ class modCreche extends DolibarrModules
 			 'user' =>2,
 		);
 		/* END LEFTMENU FAMILLE */
-		/* LEFTMENU LIST FAMILLE */
+		/* LEFTMENU LISTE FAMILLE */
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=famille',
 			 'type' =>'left',
@@ -430,8 +430,8 @@ class modCreche extends DolibarrModules
 			 'target' =>'',
 			 'user' =>2,
 		);
-		/* END LEFTMENU LIST FAMILLE */
-		/* LEFTMENU NEW FAMILLE */
+		/* END LEFTMENU LISTE FAMILLE */
+		/* LEFTMENU NOUVELLE FAMILLE */
 		$this->menu[$r++]=array(
 			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=famille',
 			 'type' =>'left',
@@ -446,55 +446,41 @@ class modCreche extends DolibarrModules
 			 'target' =>'',
 			 'user' =>2,
 		);
-		/* END LEFTMENU NEW FAMILLE */
-
-
-		/*LEFTMENU ENFANTS*/
+		/* END LEFTMENU NOUVELLE FAMILLE */
+		/* LEFTMENU ENFANTS */
 		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=creche',
-			'type'=>'left',
-			'titre'=>'Enfants',
-			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
-			'mainmenu'=>'creche',
-			'leftmenu'=>'enfants',
-			'url'=>'/creche/enfants_list.php',
-			'langs'=>'creche@creche',
-			'position'=>1000+$r,
-			'enabled'=>'$conf->creche->enabled',
-			'perms'=>'$user->hasRight("creche", "enfants", "read")',
-			'target'=>'',
-			'user'=>2,
+			 'fk_menu' =>'fk_mainmenu=creche',
+			 'type' =>'left',
+			 'titre' =>'Enfants',
+			 'mainmenu' =>'creche',
+			 'leftmenu' =>'enfants',
+			 'url' =>'/creche/enfants_list.php',
+			 'langs' =>'creche@creche',
+			 'position' =>1000 + $r,
+			 'enabled' =>'$conf->creche->enabled',
+			 'perms' =>'$user->hasRight("creche", "enfants", "read")',
+			 'target' =>'',
+			 'user' =>2,
 		);
-        $this->menu[$r++]=array(
-            'fk_menu'=>'fk_mainmenu=creche,fk_leftmenu=enfants',
-            'type'=>'left',
-            'titre'=>'Liste Enfants',
-            'mainmenu'=>'creche',
-            'leftmenu'=>'creche_enfants_list',
-            'url'=>'/creche/enfants_list.php',
-            'langs'=>'creche@creche',
-            'position'=>1000+$r,
-            'enabled'=>'$conf->creche->enabled',
-			'perms'=>'$user->hasRight("creche", "enfants", "read")',
-            'target'=>'',
-            'user'=>2,
-        );
-//         $this->menu[$r++]=array(
-//             'fk_menu'=>'fk_mainmenu=creche,fk_leftmenu=enfants',
-//             'type'=>'left',
-//             'titre'=>'Nouveau Enfant',
-//             'mainmenu'=>'creche',
-//             'leftmenu'=>'creche_enfants_new',
-//             'url'=>'/creche/enfants_card.php?action=create',
-//             'langs'=>'creche@creche',
-//             'position'=>1000+$r,
-//             'enabled'=>'$conf->creche->enabled',
-// 			'perms'=>'$user->hasRight("creche", "enfants", "write")',
-//             'target'=>'',
-//             'user'=>2
-//         );
+		/* END LEFTMENU ENFANTS */
+		/* LEFTMENU LISTE ENFANTS */
+		$this->menu[$r++]=array(
+			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=enfants',
+			 'type' =>'left',
+			 'titre' =>'Liste Enfants',
+			 'mainmenu' =>'creche',
+			 'leftmenu' =>'creche_enfants_list',
+			 'url' =>'/creche/enfants_list.php',
+			 'langs' =>'creche@creche',
+			 'position' =>1000 + $r,
+			 'enabled' =>'$conf->creche->enabled',
+			 'perms' =>'$user->hasRight("creche", "enfants", "read")',
+			 'target' =>'',
+			 'user' =>2,
+		);
+		/* END LEFTMENU LISTE ENFANTS */
 
-		/*END LEFTMENU ENFANTS*/
+
 		/* END MODULEBUILDER LEFTMENU MYOBJECT */
 		// Exports profiles provided by this module
 		$r = 1;

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2023 SuperAdmin
+/* Copyright (C) 2023 SuperAdmin <informatique@infans.fr>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,18 @@
  */
 
 /**
- * \file    lib/creche_enfants.lib.php
+ * \file    lib/creche_contrats.lib.php
  * \ingroup creche
- * \brief   Library files with common functions for Enfants
+ * \brief   Library files with common functions for Contrats
  */
 
 /**
- * Prepare array of tabs for Enfants
+ * Prepare array of tabs for Contrats
  *
- * @param	Enfants	$object		Enfants
+ * @param	Contrats	$object		Contrats
  * @return 	array					Array of tabs
  */
-function enfantsPrepareHead($object)
+function contratsPrepareHead($object)
 {
 	global $db, $langs, $conf;
 
@@ -41,17 +41,17 @@ function enfantsPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/creche/enfants_card.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/creche/contrats_card.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Card");
 	$head[$h][2] = 'card';
 	$h++;
 
-	// if ($showtabofpagecontact) {
-	// 	$head[$h][0] = dol_buildpath("/creche/enfants_contact.php", 1).'?id='.$object->id;
-	// 	$head[$h][1] = $langs->trans("Contacts");
-	// 	$head[$h][2] = 'contact';
-	// 	$h++;
-	// }
+	if ($showtabofpagecontact) {
+		$head[$h][0] = dol_buildpath("/creche/contrats_contact.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("Contacts");
+		$head[$h][2] = 'contact';
+		$h++;
+	}
 
 	if ($showtabofpagenote) {
 		if (isset($object->fields['note_public']) || isset($object->fields['note_private'])) {
@@ -62,7 +62,7 @@ function enfantsPrepareHead($object)
 			if (!empty($object->note_public)) {
 				$nbNote++;
 			}
-			$head[$h][0] = dol_buildpath('/creche/enfants_note.php', 1).'?id='.$object->id;
+			$head[$h][0] = dol_buildpath('/creche/contrats_note.php', 1).'?id='.$object->id;
 			$head[$h][1] = $langs->trans('Notes');
 			if ($nbNote > 0) {
 				$head[$h][1] .= (!getDolGlobalInt('MAIN_OPTIMIZEFORTEXTBROWSER') ? '<span class="badge marginleftonlyshort">'.$nbNote.'</span>' : '');
@@ -75,10 +75,10 @@ function enfantsPrepareHead($object)
 	if ($showtabofpagedocument) {
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 		require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
-		$upload_dir = $conf->creche->dir_output."/enfants/".dol_sanitizeFileName($object->ref);
+		$upload_dir = $conf->creche->dir_output."/contrats/".dol_sanitizeFileName($object->ref);
 		$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
 		$nbLinks = Link::count($db, $object->element, $object->id);
-		$head[$h][0] = dol_buildpath("/creche/enfants_document.php", 1).'?id='.$object->id;
+		$head[$h][0] = dol_buildpath("/creche/contrats_document.php", 1).'?id='.$object->id;
 		$head[$h][1] = $langs->trans('Documents');
 		if (($nbFiles + $nbLinks) > 0) {
 			$head[$h][1] .= '<span class="badge marginleftonlyshort">'.($nbFiles + $nbLinks).'</span>';
@@ -87,17 +87,12 @@ function enfantsPrepareHead($object)
 		$h++;
 	}
 
-	$head[$h][0] = dol_buildpath("/custom/creche/enfant_contrats.php", 1).'?idEnfant='.$object->id;
-	$head[$h][1] = $langs->trans("Contrats");
-	$head[$h][2] = 'contrats';
-	$h++;
-
-	// if ($showtabofpageagenda) {
-	// 	$head[$h][0] = dol_buildpath("/creche/enfants_agenda.php", 1).'?id='.$object->id;
-	// 	$head[$h][1] = $langs->trans("Events");
-	// 	$head[$h][2] = 'agenda';
-	// 	$h++;
-	// }
+	if ($showtabofpageagenda) {
+		$head[$h][0] = dol_buildpath("/creche/contrats_agenda.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("Events");
+		$head[$h][2] = 'agenda';
+		$h++;
+	}
 
 	// Show more tabs from modules
 	// Entries must be declared in modules descriptor with line
@@ -107,9 +102,9 @@ function enfantsPrepareHead($object)
 	//$this->tabs = array(
 	//	'entity:-tabname:Title:@creche:/creche/mypage.php?id=__ID__'
 	//); // to remove a tab
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'enfants@creche');
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'contrats@creche');
 
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'enfants@creche', 'remove');
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'contrats@creche', 'remove');
 
 	return $head;
 }

@@ -325,7 +325,7 @@ class ActionsCreche extends CommonHookActions
 		// echo '<pre>';var_dump($parameters);echo '</pre>';
 		
 		$error = 0; // Error counter
-		if (in_array($parameters['currentcontext'], array('enfantscard', 'enfantsdocument'))) { 
+		if (in_array($parameters['currentcontext'], array('enfantscard', 'enfantsdocument', 'enfants_contrats'))) { 
 			if ($conf->creche->enabled) {
 				if (isset($parameters['rowid'])) {
 					$sql = "SELECT photo_id  
