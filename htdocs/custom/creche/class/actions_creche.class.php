@@ -131,8 +131,9 @@ class ActionsCreche extends CommonHookActions
 	public function addSearchEntry($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
+		// var_dump($parameters['currentcontext']);
 		$error = 0; // Error counter
-		if ( in_array($parameters['currentcontext'], array('searchform'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if ( in_array($parameters['currentcontext'], array('searchform', 'crecheparentslist', 'crecheenfantslist'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			$monEntry = array(
 				'searchinfamille' => array	(
 					'position' => 2,
