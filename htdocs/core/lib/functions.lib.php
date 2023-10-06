@@ -10427,7 +10427,15 @@ function getAdvancedPreviewUrl($modulepart, $relativepath, $alldata = 0, $param 
 
 	if ($alldata == 1) {
 		if ($isAllowedForPreview) {
-			return array('target'=>'_blank', 'css'=>'documentpreview', 'url'=>DOL_URL_ROOT.'/document.php?modulepart='.$modulepart.'&attachment=0&file='.urlencode($relativepath).($param ? '&'.$param : ''), 'mime'=>dol_mimetype($relativepath));
+			include_once(DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php');
+			$hookmanager = new HookManager($db);
+			$hookmanager->initHooks(array('documentCreche'));
+			$reshook = $hookmanager->executeHooks('getOutPutDir');
+			if (empty($reshook)) {
+				return array('target'=>'_blank', 'css'=>'documentpreview', 'url'=>DOL_URL_ROOT.'/document.php?modulepart='.$modulepart.'&attachment=0&file='.urlencode($relativepath).($param ? '&'.$param : ''), 'mime'=>dol_mimetype($relativepath));
+			} elseif ($reshook == 1) {
+				return array('target'=>'_blank', 'css'=>'documentpreview', 'url'=>DOL_URL_ROOT. $hookmanager->resArray['path'] .'/document.php?modulepart='.$modulepart.'&attachment=0&file='.urlencode($relativepath).($param ? '&'.$param : ''), 'mime'=>dol_mimetype($relativepath));
+			}
 		} else {
 			return array();
 		}

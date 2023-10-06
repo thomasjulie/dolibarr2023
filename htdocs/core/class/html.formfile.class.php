@@ -1363,7 +1363,13 @@ class FormFile
 
 					// Show file name with link to download
 					//print "XX".$file['name'];	//$file['name'] must be utf8
-					print '<a class="paddingright valignmiddle" href="'.DOL_URL_ROOT.'/document.php?modulepart='.$modulepart;
+					// echo '<pre>';var_dump($hookmanager);echo '</pre>';
+					$reshook = $hookmanager->executeHooks('getOutPutDir');
+					if (empty($reshook)) {
+						print '<a class="paddingright valignmiddle" href="'.DOL_URL_ROOT.'/document.php?modulepart='.$modulepart;
+					} elseif ($reshook == 1) {
+						print '<a class="paddingright valignmiddle" href="'.DOL_URL_ROOT. $hookmanager->resArray['path'] .'/document.php?modulepart='.$modulepart;
+					}
 					if ($forcedownload) {
 						print '&attachment=1';
 					}
@@ -1466,7 +1472,12 @@ class FormFile
 									$paramlink .= ($paramlink ? '&' : '').'attachment=1';
 								}
 
-								$fulllink = $urlwithroot.'/document.php'.($paramlink ? '?'.$paramlink : '');
+								$reshook = $hookmanager->executeHooks('getOutPutDir');
+								if (empty($reshook)) {
+									$fulllink = $urlwithroot.'/document.php'.($paramlink ? '?'.$paramlink : '');
+								} elseif ($reshook == 1) {
+									$fulllink = $urlwithroot. $hookmanager->resArray['path'] .'/document.php'.($paramlink ? '?'.$paramlink : '');
+								}
 
 								print '<a href="'.$fulllink.'" target="_blank" rel="noopener">'.img_picto($langs->trans("FileSharedViaALink"), 'globe').'</a> ';
 								print '<input type="text" class="quatrevingtpercent minwidth200imp nopadding small" id="downloadlink'.$filearray[$key]['rowid'].'" name="downloadexternallink" title="'.dol_escape_htmltag($langs->trans("FileSharedViaALink")).'" value="'.dol_escape_htmltag($fulllink).'">';
