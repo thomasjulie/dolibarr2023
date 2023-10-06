@@ -122,6 +122,7 @@ class modCreche extends DolibarrModules
 				'crecheenfantslist',
 				'famillecard',
 				'enfants_contrats',
+				'searchform',
 				'documentCreche',
 				'familledocument',
 				'parentsdocument',

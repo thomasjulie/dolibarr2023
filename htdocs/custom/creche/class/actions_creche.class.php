@@ -128,6 +128,52 @@ class ActionsCreche extends CommonHookActions
 		}
 	}
 
+	// fonction utilisant le hook de la recherche global pour y ajouter nos objects
+	public function addSearchEntry($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+		// var_dump($parameters['currentcontext']);
+		$error = 0; // Error counter
+		if ( in_array($parameters['currentcontext'], array('searchform', 'crecheparentslist', 'crecheenfantslist'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			$monEntry = array(
+				'searchinfamille' => array	(
+					'position' => 2,
+					'shortcut' => 'F',
+					'img' => 'object_creche',
+					'label' => 'Famille',
+					'text' =>  'Famille',
+					'url' => '/custom/creche/famille_list.php'
+				),
+				'searchinparents' => array	(
+					'position' => 2,
+					'shortcut' => 'F',
+					'img' => 'object_creche',
+					'label' => 'Parents',
+					'text' =>  'Parents',
+					'url' => '/custom/creche/parents_list.php'
+				),
+				'searchinenfants' => array	(
+					'position' => 2,
+					'shortcut' => 'F',
+					'img' => 'object_creche',
+					'label' => 'Enfants',
+					'text' =>  'Enfants',
+					'url' => '/custom/creche/enfants_list.php'
+				),
+			);
+			$parameters['arrayresult'] = array_merge($parameters['arrayresult'], $monEntry);
+		}
+
+		if (!$error) {
+			$this->results = $parameters['arrayresult'];
+			// $this->resprints = 'A text to show';
+			return 1; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
 	// Modifier affichage des formulaires de création et de modification
 	public function showField($parameters, &$object, &$action, $hookmanager)
 	{
