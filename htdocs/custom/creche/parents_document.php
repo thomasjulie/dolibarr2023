@@ -76,6 +76,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche.lib.php';
 dol_include_once('/creche/class/parents.class.php');
 dol_include_once('/creche/lib/creche_parents.lib.php');
 
@@ -119,7 +120,7 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 
 if ($id > 0 || !empty($ref)) {
-	$upload_dir = $conf->creche->multidir_output[$object->entity ? $object->entity : $conf->entity]."/parents/".get_exdir(0, 0, 0, 1, $object);
+	$upload_dir = getOutPutDir('parents', $object->id);
 }
 
 // There is several ways to check permission.
@@ -251,8 +252,8 @@ $permissiontoadd = 1;
 $permtoedit = 1;
 $param = '&id='.$object->id;
 
-//$relativepathwithnofile='parents/' . dol_sanitizeFileName($object->id).'/';
-$relativepathwithnofile = 'parents/'.dol_sanitizeFileName($object->ref).'/';
+$relativepathwithnofile = getOutPutDir('parents', $object->id).'/';
+// $relativepathwithnofile = 'parents/'.dol_sanitizeFileName($object->ref).'/';
 
 include DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
 

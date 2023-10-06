@@ -227,13 +227,13 @@ if ($modulepart === 'medias' && $entity != $conf->entity) {
 }
 
 $parts = explode('#', $original_file);
-$typeObject = $parts[0];
-$partialPath = implode('/', $parts);
+$typeObject = GETPOST('type');
+$path = implode('/', $parts);
 
 $check_access = array(
 	'accessallowed' => 1,
 	'sqlprotectagainstexternals' => '',
-	'original_file' => '/usr/share/dolibarr/documents/creche/' . $partialPath
+	'original_file' => $path
 );
 $accessallowed              = $check_access['accessallowed'];
 $sqlprotectagainstexternals = $check_access['sqlprotectagainstexternals'];

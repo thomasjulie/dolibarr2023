@@ -90,3 +90,16 @@ function validateMobilePhone($phone)
 {
 	return preg_match("#^(\+33|0)[67][0-9]{8}$#", $phone);
 }
+
+/**
+ * Get the path for the documents of an object
+ * 
+ * @param int $objectType type of object (famille, parents, enfants, ...)
+ * @param int $objectId ID of the object
+ * @return 	string
+ */
+function getOutPutDir($objectType, $objectId)
+{
+	global $dolibarr_main_data_root;
+	return $dolibarr_main_data_root . '/creche/' . strtolower($objectType) . '/' . $objectId;
+}

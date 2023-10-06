@@ -24,6 +24,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonhookactions.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche.lib.php';
 
 /**
  * Class ActionsCreche
@@ -323,7 +324,9 @@ class ActionsCreche extends CommonHookActions
 	public function inputFile($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
-		
+
+		// echo '<pre>';var_dump($parameters);echo '</pre>';
+
 		$error = 0; // Error counter
 		if (in_array($parameters['currentcontext'], array('enfantscard'))) { 
 			if ($conf->creche->enabled) {
@@ -336,15 +339,16 @@ class ActionsCreche extends CommonHookActions
 						$req = $this->db->query($sql);
 						$id = $this->db->fetch_object($req)->Auto_increment;
 					}
-					
+
+					$dossier = getOutPutDir('enfants', $id);
+					// echo '<pre>';var_dump($parameters, $id, $dossier);echo '</pre>';die;
 					if (isset($_FILES[$field])) {
-						if (!file_exists('../../../documents/creche/enfants/' . $id)) {
-							mkdir('../../../documents/creche/enfants/' . $id, 0777, true);
+						if (!file_exists($dossier)) {
+							mkdir($dossier, 0777, true);
 						}
-						$dossier = '../../../documents/creche/enfants/' . $id . '/';
 						$fichier = basename($_FILES[$field]['name']);
-						if(move_uploaded_file($_FILES[$field]['tmp_name'], $dossier . $fichier)) {
-							$object->$field = trim($dossier, './') . '/' . $fichier;
+						if(move_uploaded_file($_FILES[$field]['tmp_name'], $dossier . '/' . $fichier)) {
+							$object->$field = trim($dossier, '.') . '/' . $fichier;
 							return 1;
 						}
 					}
@@ -374,7 +378,7 @@ class ActionsCreche extends CommonHookActions
 		if (in_array($parameters['currentcontext'], array('enfantscard', 'enfantsdocument', 'enfants_contrats'))) { 
 			if ($conf->creche->enabled) {
 				if (isset($parameters['rowid'])) {
-					$sql = "SELECT photo_id  
+					$sql = "SELECT photo_id, entity  
 							FROM " . $this->db->prefix() . "creche_enfants 
 							WHERE rowid = " . $parameters['rowid'];
 					$req = $this->db->query($sql);
@@ -384,9 +388,10 @@ class ActionsCreche extends CommonHookActions
 						$element = '<span class="fa fa-file" style="" title="No photo"></span>';
 					} else {
 						$parts = explode('/', $obj->photo_id);
-						$file = $parts[2] . '#' . $parts[3] . '#' . $parts[4];
+						// $file = $parts[2] . '#' . $parts[3] . '#' . $parts[4];
+						$file = implode('#', $parts);
 						$element = '<img src="viewimage.php?modulepart=creche&file=' 
-						. urlencode($file) . '&entity=1" style="max-width: 150px;height: auto;">';
+						. urlencode($file) . '&entity=' . $obj->entity . '&type=enfants" style="max-width: 150px;height: auto;">';
 					}
 
 					$object .= '<div class="floatleft inline-block valignmiddle divphotoref"><div class="photoref">';
@@ -395,6 +400,32 @@ class ActionsCreche extends CommonHookActions
 					
 					return 1;
 				}
+			}
+		}
+		
+		
+		if (!$error) {
+			// $this->results = array('myreturn' => 999);
+			// $this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+	
+	// Trouver le bon chemin pour les documents
+	public function getOutPutDir($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+
+		// echo '<pre>';var_dump($parameters);echo '</pre>';
+		
+		$error = 0; // Error counter
+		if (in_array($parameters['currentcontext'], array('documentCreche', 'familledocument', 'parentsdocument', 'enfantsdocument'))) { 
+			if ($conf->creche->enabled) {
+				$this->results = array('path' => '/custom/creche');
+				return 1;
 			}
 		}
 		

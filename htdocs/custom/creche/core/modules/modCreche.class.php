@@ -122,7 +122,11 @@ class modCreche extends DolibarrModules
 				'crecheenfantslist',
 				'famillecard',
 				'enfants_contrats',
-				'searchform'
+				'searchform',
+				'documentCreche',
+				'familledocument',
+				'parentsdocument',
+				'enfantsdocument'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',

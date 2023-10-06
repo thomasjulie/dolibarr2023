@@ -114,77 +114,6 @@ if (!$permissiontoread) accessforbidden();
  * Actions
  */
 
- if ($action == 'create') {
-	$date_start = GETPOST('date_start');
-	$date_end = GETPOST('date_end');
-
-	$sql = "INSERT INTO " . $db->prefix() . "creche_contrats 
-	(fk_enfants, entity, type, date_start, date_end, nb_day, days_of_week, hours_of_day, date_created)
-	VALUES (" . $enfant->id . ", " . $enfant->entity . ", '" . $type . "', '" . $date_start . "', '" . $date_end . "', ";
-
-	if ($type == 'occasionnel') {
-		$nb_day = GETPOST('nb_day');
-		$tmpHours = array(
-			0 => array(
-				'start' => GETPOST('hours_start'),
-				'end' => GETPOST('hours_end')
-			)
-		);
-		$hours_of_day = json_encode($tmpHours);
-	} else {
-		$nb_day = 'NULL';
-		$day_1 = null;
-		$day_2 = null;
-		$day_3 = null;
-		$day_4 = null;
-		$day_5 = null;
-		$tmpHours = array();
-		$days_of_week = array();
-		if (GETPOST('hours_of_day_start_1') != '' && GETPOST('hours_of_day_end_1') != '') {
-			$tmpHours[1] = array(
-				'start' => GETPOST('hours_of_day_start_1'),
-				'end' => GETPOST('hours_of_day_end_1')
-			);
-			$days_of_week[] = 1;
-		}
-		if (GETPOST('hours_of_day_start_2') != '' && GETPOST('hours_of_day_end_2') != '') {
-			$tmpHours[2] = array(
-				'start' => GETPOST('hours_of_day_start_2'),
-				'end' => GETPOST('hours_of_day_end_2')
-			);
-			$days_of_week[] = 2;
-		}
-		if (GETPOST('hours_of_day_start_3') != '' && GETPOST('hours_of_day_end_3') != '') {
-			$tmpHours[3] = array(
-				'start' => GETPOST('hours_of_day_start_3'),
-				'end' => GETPOST('hours_of_day_end_3')
-			);
-			$days_of_week[] = 3;
-		}
-		if (GETPOST('hours_of_day_start_4') != '' && GETPOST('hours_of_day_end_4') != '') {
-			$tmpHours[4] = array(
-				'start' => GETPOST('hours_of_day_start_4'),
-				'end' => GETPOST('hours_of_day_end_4')
-			);
-			$days_of_week[] = 4;
-		}
-		if (GETPOST('hours_of_day_start_5') != '' && GETPOST('hours_of_day_end_5') != '') {
-			$tmpHours[5] = array(
-				'start' => GETPOST('hours_of_day_start_5'),
-				'end' => GETPOST('hours_of_day_end_5')
-			);
-			$days_of_week[] = 5;
-		}
-		$hours_of_day = json_encode($tmpHours);
-	}
-
-	$sql .= $nb_day . ", '" . implode(';', $days_of_week) . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "')";
-	$req = $db->query($sql);
-
-	// echo '<pre>';var_dump($tmpHours, $hours_of_day, implode(';', $days_of_week), $sql);echo '</pre>';
-}
-
-
 
 
 /*
@@ -212,207 +141,82 @@ print dol_get_fiche_head($head, 'contrats', $langs->trans("Enfants"), -1, $enfan
 
 $linkback = '<a href="'.dol_buildpath('/creche/famille_enfants.php', 1).'?id=' . $enfant->fk_famille . '">'.$langs->trans("Retour à la famille").'</a>';
 
+$sql = "SELECT * 
+		FROM " . $db->prefix() . "creche_contrats 
+		WHERE fk_enfants = " . $enfant->id;
+$req = $db->query($sql);
+
 dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 
 // echo '<pre>';var_dump($enfantid, $enfant);echo '</pre>';
 ?>
-<!-- </div> -->
-<form method="post">
-	<input type="hidden" name="action" value="choose_type">
-	<input type="hidden" name="token" value="<?= newToken() ?>">
-	<select name="type" onchange="this.form.submit()">
-		<option>Choisir le type de contrat</option>
-		<option value="occasionnel" <?= $type == 'occasionnel' ? 'selected' : '' ?>>Occasionnel</option>
-		<option value="regulier" <?= $type == 'regulier' ? 'selected' : '' ?>>Régulier</option>
-	</select>
-</form><br />
 
-<?php if ($action == 'choose_type' && $type != ''): ?>
-	<form method="post">
-	<input type="hidden" name="action" value="create">
-	<input type="hidden" name="token" value="<?= newToken() ?>">
-	<input type="hidden" name="type" value="<?= $type ?>">
-	
-	<table class="border centpercent">
-		<tbody>
-			<tr>
-				<td>
-					Date début de contrat
-				</td>
-				<td>
-					<input type="date" name="date_start" value="<?= date('Y-m-d') ?>">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Date fin de contrat
-				</td>
-				<td>
-					<input type="date" name="date_end">
-				</td>
-			</tr>
-			<?php if ($type == 'occasionnel'): ?>
+<div class="fichecenter">
+		<div class="underbanner clearboth"></div>
+		<table class="centpercent notopnoleftnoright table-fiche-title">
+			<tbody>
 				<tr>
-					<td>
-						Nombre de jours
-					</td>
-					<td>
-						<input type="number" name="nb_day">
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Heure d'arrivée
-					</td>
-					<td>
-						<input type="time" name="hours_start" />
+					<td class="nobordernopadding valignmiddle col-title"></td>
+					<td class="nobordernopadding valignmiddle right col-right">
+						<a class="btnTitle btnTitlePlus" 
+						href="/custom/creche/enfants_nouvcontrat.php?token=<?= newToken() ?>&idEnfant=<?= $enfant->id ?>" 
+						title="Nouveau Contrat">
+							<span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span>
+						</a>
 					</td>
 				</tr>
-				<tr>
-					<td>
-						Heure de départ
-					</td>
-					<td>
-						<input type="time" name="hours_end" />
-					</td>
+			</tbody>
+		</table>
+		<!-- <hr> -->
+		<table class="tagtable liste">
+			<thead>
+				<tr class="liste_titre">
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de début") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de fin") ?></th>
+					<?php if ($type == 'occasionnel'): ?>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Nombre de jours") ?></th>
+					<?php endif; ?>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures de présence") ?></th>
 				</tr>
-			<?php else: ?>
-				<!-- <tr>
-					<td>
-						Jours de la semaine
-					</td>
-					<td>
-						<label for="days_of_week_1">Lundi</label>
-						<input type="checkbox" name="days_of_week[]" value="1" id="days_of_week_1">
-						<label for="days_of_week_2">Mardi</label>
-						<input type="checkbox" name="days_of_week[]" value="2" id="days_of_week_2">
-						<label for="days_of_week_3">Mercredi</label>
-						<input type="checkbox" name="days_of_week[]" value="3" id="days_of_week_3">
-						<label for="days_of_week_4">Jeudi</label>
-						<input type="checkbox" name="days_of_week[]" value="4" id="days_of_week_4">
-						<label for="days_of_week_5">Vendredi</label>
-						<input type="checkbox" name="days_of_week[]" value="5" id="days_of_week_5">
-					</td>
-				</tr> -->
-				<tr style="display: none;">
-					<td>
-						Heures de présence
-					</td>
-					<td>
-						<table>
-							<tr>
-								<td>Lundi</td>
-								<td>Mardi</td>
-								<td>Mercredi</td>
-								<td>Jeudi</td>
-								<td>Vendredi</td>
-							</tr>
-							<tr>
-								<td>
-									<label for="hours_of_day_start_1">de</label>
-									<input type="time" id="hours_of_day_start_1" name="hours_of_day_1[]" /><br />
-									<label for="hours_of_day_end_1">à</label>
-									<input type="time" id="hours_of_day_end_1" name="hours_of_day_1[]" />
-								</td>
-								<td>
-									<label for="hours_of_day_start_2">de</label>
-									<input type="time" id="hours_of_day_start_2" name="hours_of_day_2[]" /><br />
-									<label for="hours_of_day_end_2">à</label>
-									<input type="time" id="hours_of_day_end_2" name="hours_of_day_2[]" />
-								</td>
-								<td>
-									<label for="hours_of_day_start_3">de</label>
-									<input type="time" id="hours_of_day_start_3" name="hours_of_day_3[]" /><br />
-									<label for="hours_of_day_end_3">à</label>
-									<input type="time" id="hours_of_day_end_3" name="hours_of_day_3[]" />
-								</td>
-								<td>
-									<label for="hours_of_day_start_4">de</label>
-									<input type="time" id="hours_of_day_start_4" name="hours_of_day_4[]" /><br />
-									<label for="hours_of_day_end_4">à</label>
-									<input type="time" id="hours_of_day_end_4" name="hours_of_day_4[]" />
-								</td>
-								<td>
-									<label for="hours_of_day_start_5">de</label>
-									<input type="time" id="hours_of_day_start_5" name="hours_of_day_5[]" /><br />
-									<label for="hours_of_day_end_5">à</label>
-									<input type="time" id="hours_of_day_end_5" name="hours_of_day_5[]" />
-								</td>
-							</tr>
-						</table>
-						
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Heures de présence
-					</td>
-					<td>
-						<table>
-							<tr>
-								<td></td>
-								<td>Heure d'arrivée</td>
-								<td>Heure de départ</td>
-							</tr>
-							<tr>
-								<td>Lundi</td>
-								<td>
-									<input type="time" id="hours_of_day_start_1" name="hours_of_day_start_1" />
-								</td>
-								<td>
-									<input type="time" id="hours_of_day_end_1" name="hours_of_day_end_1" />
-								</td>
-							</tr>
-							<tr>
-								<td>Mardi</td>
-								<td>
-									<input type="time" id="hours_of_day_start_2" name="hours_of_day_start_2" />
-								</td>
-								<td>
-									<input type="time" id="hours_of_day_end_2" name="hours_of_day_end_2" />
-								</td>
-							</tr>
-							<tr>
-								<td>Mercredi</td>
-								<td>
-									<input type="time" id="hours_of_day_start_3" name="hours_of_day_start_3" />
-								</td>
-								<td>
-									<input type="time" id="hours_of_day_end_3" name="hours_of_day_end_3" />
-								</td>
-							</tr>
-							<tr>
-								<td>Jeudi</td>
-								<td>
-									<input type="time" id="hours_of_day_start_4" name="hours_of_day_start_4" />
-								</td>
-								<td>
-									<input type="time" id="hours_of_day_end_4" name="hours_of_day_end_4" />
-								</td>
-							</tr>
-							<tr>
-								<td>Vendredi</td>
-								<td>
-									<input type="time" id="hours_of_day_start_5" name="hours_of_day_start_5" />
-								</td>
-								<td>
-									<input type="time" id="hours_of_day_end_5" name="hours_of_day_end_5" />
-								</td>
-							</tr>
-						</table>
-						
-					</td>
-				</tr>
-			<?php endif; ?>
-			<tr>
-				<td colspan="2" class="center" style="border: none;">
-					<input type="submit" class="butAction" name="submit" value="Valider">
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</form>
-<?php endif; ?>
+			</thead>
+			<tbody>
+				<?php while ($res = $db->fetch_object($req)): 
+					$hours = json_decode($res->hours_of_day, true);
+					?>
+					<tr>
+						<td>
+							<?= $res->type ?>
+						</td>
+						<td><?= $res->date_start ?></td>
+						<td><?= $res->date_end ?></td>
+						<?php if ($type == 'occasionnel'): ?>
+						<td><?= $res->nb_day ?></td>
+						<td>De <?= $hours[0]['start'] ?> à <?= $hours[0]['end'] ?></td>
+						<?php else: ?>
+						<td>
+							<?php if (isset($hours[1])): ?>
+								Lundi de <?= $hours[1]['start'] ?> à <?= $hours[1]['end'] ?><br />
+							<?php endif; ?>
+							<?php if (isset($hours[2])): ?>
+								Mardi de <?= $hours[2]['start'] ?> à <?= $hours[2]['end'] ?><br />
+							<?php endif; ?>
+							<?php if (isset($hours[3])): ?>
+								Mercredi de <?= $hours[3]['start'] ?> à <?= $hours[3]['end'] ?><br />
+							<?php endif; ?>
+							<?php if (isset($hours[4])): ?>
+								Jeudi de <?= $hours[4]['start'] ?> à <?= $hours[4]['end'] ?><br />
+							<?php endif; ?>
+							<?php if (isset($hours[5])): ?>
+								Vendredi de <?= $hours[5]['start'] ?> à <?= $hours[5]['end'] ?>
+							<?php endif; ?>
+						</td>
+						<?php endif; ?>
+					</tr>
+				<?php endwhile; ?>
+			</tbody>
+		</table>
+	</div>
 
 <?php
 llxFooter();
