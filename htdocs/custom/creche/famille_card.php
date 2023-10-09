@@ -702,6 +702,19 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$diroutput = $conf->creche->dir_output;
 	$trackid = 'famille'.$object->id;
 
+	if (GETPOST('addfile', 'alpha')) {
+		$trackid = GETPOST('trackid', 'aZ09');
+	
+		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	
+		// Set tmp user directory
+		$vardir = $conf->user->dir_output."/".$user->id;
+		$upload_dir_tmp = $vardir.'/temp'; // TODO Add $keytoavoidconflict in upload_dir path
+	
+		dol_add_file_process($upload_dir_tmp, 1, 0, 'addedfile', '', null, $trackid, 0);
+		$action = 'presend';
+	}
+
 	// Formulaire envoie d'email
 	if ($action == 'presend') {
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
@@ -754,10 +767,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		// Show form
 		print $formmail->get_form();
 		
-	}
+	}	
 
 	// Envoie email
-	if ($action == 'send') {
+	if ($action == 'send' && GETPOST('sendmail', 'alpha')) {
 		require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
 		$formmail = new FormMail($db);
