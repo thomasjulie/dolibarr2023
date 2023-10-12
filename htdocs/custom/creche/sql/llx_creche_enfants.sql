@@ -18,7 +18,7 @@ CREATE TABLE llx_creche_enfants(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid int AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	fk_famille int NOT NULL, 
-	entity int DEFAULT 1 NOT NULL, 
+	entity int NOT NULL, 
 	genre enum("fille","garcon") NOT NULL, 
 	nom varchar(150) NOT NULL, 
 	prenom varchar(150) NOT NULL, 

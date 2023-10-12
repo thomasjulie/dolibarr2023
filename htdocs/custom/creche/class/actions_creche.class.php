@@ -249,6 +249,25 @@ class ActionsCreche extends CommonHookActions
 					maxlength="150" value="' . $value . '">';
 					echo $out;
 					return 1;
+				} elseif ($parameters['field'] == 'entity' && $parameters['currentcontext'] == 'famillecard') {
+					$currentEntity = getEntity('famille', 0);
+					$sql = "SELECT rowid, label  
+					FROM " . $this->db->prefix() . "entity WHERE rowid != 1";
+					$req = $this->db->query($sql);
+					if ($currentEntity == 1) {
+						$out = '<select class="flat" name="entity">';
+						$out .= '<option value="-1">Choisir une crèche</option>';
+						while ($option = $this->db->fetch_object($req)) {
+							$out .= '<option value="' . $option->rowid . '">' 
+							. ucfirst($option->label) . '</option>';
+						}
+						$out .= '</select>';
+					} else {
+						$out = '<input type="hidden" name="entity" value="' . $currentEntity . '">';
+					}
+
+					echo $out;
+					return 1;
 				}
 				
 			}
@@ -425,6 +444,33 @@ class ActionsCreche extends CommonHookActions
 		if (in_array($parameters['currentcontext'], array('documentCreche', 'familledocument', 'parentsdocument', 'enfantsdocument'))) { 
 			if ($conf->creche->enabled) {
 				$this->results = array('path' => '/custom/creche');
+				return 1;
+			}
+		}
+		
+		
+		if (!$error) {
+			// $this->results = array('myreturn' => 999);
+			// $this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+	
+	// Enregistrer l'entité choisie
+	public function setEntity($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+
+		// echo '<pre>';var_dump($parameters);echo '</pre>';
+		
+		$error = 0; // Error counter
+		if (in_array($parameters['currentcontext'], array('famillecard', 'parentscard', 'enfantscard'))) { 
+			if ($conf->creche->enabled) {
+				$field = $parameters['field'];
+				$object->$field = $parameters['value'];
 				return 1;
 			}
 		}

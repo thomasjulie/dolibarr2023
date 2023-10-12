@@ -138,7 +138,7 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
-$enablepermissioncheck = 0;
+$enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
 	$permissiontoread = $user->hasRight('creche', 'parents', 'read');
 	$permissiontoadd = $user->hasRight('creche', 'parents', 'write'); // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
@@ -271,6 +271,12 @@ $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
 
+if (GETPOST('famid', 'int') != 0) {
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_famille WHERE rowid = " . GETPOST('famid', 'int');
+	$req = $db->query($sql);
+	$famille = $db->fetch_object($req);
+}
+
 $title = $langs->trans("Parents")." - ".$langs->trans('Card');
 //$title = $object->ref." - ".$langs->trans('Card');
 if ($action == 'create') {
@@ -339,7 +345,7 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
 	print '<input type="hidden" name="mdp" value="' . dol_hash(new_motDePasse()) .'">';
-	print '<input type="hidden" name="entity" value="' . getEntity('parents', 0) . '">';
+	print '<input type="hidden" name="entity" value="' . $famille->entity . '">';
 
 	print dol_get_fiche_head(array(), '');
 
@@ -408,6 +414,7 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
 	unset($object->fields['mdp']);
+	unset($object->fields['entity']);
 	// echo '<pre>';var_dump($object->fields, $object->element.'card');echo '</pre>';
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 

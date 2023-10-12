@@ -18,11 +18,10 @@ CREATE TABLE llx_creche_contrats(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid int AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	fk_enfants int NOT NULL, 
-	entity int DEFAULT 1 NOT NULL, 
+	entity int NOT NULL, 
 	type varchar(100) NOT NULL, 
 	date_start date NOT NULL, 
 	date_end date NOT NULL, 
-	nb_day int, 
 	days_of_week varchar(100), 
 	hours_of_day varchar(250) NOT NULL, 
 	date_created datetime NOT NULL, 

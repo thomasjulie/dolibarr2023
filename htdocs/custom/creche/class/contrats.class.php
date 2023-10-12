@@ -116,11 +116,10 @@ class Contrats extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
 		'fk_enfants' => array('type'=>'int', 'label'=>'Fkenfants', 'enabled'=>'1', 'position'=>15, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx',),
-		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-2, 'default'=>'1', 'index'=>1,),
+		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-2, 'index'=>1,),
 		'type' => array('type'=>'varchar(100)', 'label'=>'Type', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>-1,),
 		'date_start' => array('type'=>'date', 'label'=>'Datestart', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1,),
 		'date_end' => array('type'=>'date', 'label'=>'Dateend', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>-1,),
-		'nb_day' => array('type'=>'int', 'label'=>'Nbday', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>-1,),
 		'days_of_week' => array('type'=>'varchar(100)', 'label'=>'Daysofweek', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>-1,),
 		'hours_of_day' => array('type'=>'varchar(250)', 'label'=>'Hoursofday', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
 		'date_created' => array('type'=>'datetime', 'label'=>'Datecreated', 'enabled'=>'1', 'position'=>55, 'notnull'=>1, 'visible'=>-1,),
@@ -133,7 +132,6 @@ class Contrats extends CommonObject
 	public $type;
 	public $date_start;
 	public $date_end;
-	public $nb_day;
 	public $days_of_week;
 	public $hours_of_day;
 	public $date_created;

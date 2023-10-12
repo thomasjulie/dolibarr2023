@@ -30,7 +30,7 @@ if(preg_match("#^(\+33|0)[67][0-9]{8}$#", $sendto)) {
     <input type="hidden" name="action" value="send">
     <input type="hidden" name="models" value="body">
     <input type="hidden" name="smsid" value="0">
-    <input type="hidden" name="returnurl" value="/custom/creche/famille_agenda.php?id=<?= $id ?>&action=sendSms">
+    <input type="hidden" name="returnurl" value="/custom/creche/famille_card.php?id=<?= $id ?>&action=sendSms">
     <input name="deferred" type="hidden" value="0">
     <input name="priority" type="hidden" value="3">
     <input name="class" type="hidden" value="1">

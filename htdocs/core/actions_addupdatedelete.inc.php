@@ -65,6 +65,10 @@ if ($action == 'add' && !empty($permissiontoadd)) {
 				continue; // The field was not submited to be saved
 			}
 		}
+
+		$actionHook = "edit";
+		$reshook = $hookmanager->executeHooks('setEntity', array('field' => $key, 'value' => $_POST['entity']), $object, $actionHook);
+
 		// Ignore special fields
 		if (in_array($key, array('rowid', 'entity', 'import_key'))) {
 			continue;

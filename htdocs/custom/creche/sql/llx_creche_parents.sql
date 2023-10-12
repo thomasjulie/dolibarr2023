@@ -18,7 +18,7 @@ CREATE TABLE llx_creche_parents(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid int AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	fk_famille int NOT NULL, 
-	entity int DEFAULT 1 NOT NULL, 
+	entity int NOT NULL, 
 	civilite enum("m", "mme") NOT NULL, 
 	nom varchar(150) NOT NULL, 
 	prenom varchar(150) NOT NULL, 

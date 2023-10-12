@@ -134,7 +134,7 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
-$enablepermissioncheck = 0;
+$enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
 	$permissiontoread = $user->hasRight('creche', 'famille', 'read');
 	$permissiontoadd = $user->hasRight('creche', 'famille', 'write'); // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
@@ -214,7 +214,7 @@ if (empty($reshook)) {
 		}
 		
 		if ($tel != '') {
-			$sql = "SELECT mail 
+			$sql = "SELECT tel_portable 
 			FROM " . $db->prefix() . "creche_famille 
 			WHERE tel_portable = '" . $tel . "'";
 			$req = $db->query($sql);
@@ -245,6 +245,13 @@ if (empty($reshook)) {
 					}
 					$msg .= 'Veuillez renseigner un numéro de téléphone portable valide (doit être composé de 10 chiffres ou 9 si utilisation de +33)';
 				}
+			}
+
+			if (GETPOST('entity') == -1 && $action == 'add') { // choix de la crèche
+				if ($msg != '') {
+					$msg .= "<br />";
+				}
+				$msg .= 'Veuillez choisir une crèche';
 			}
 			// die;
 		}
@@ -370,7 +377,7 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
 
-	print '<input type="hidden" name="entity" value="' . getEntity('famille', 0) . '">';
+	// print '<input type="hidden" name="entity" value="' . getEntity('famille', 0) . '">';
 
 	print dol_get_fiche_head(array(), '');
 
@@ -385,7 +392,6 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
-	unset($object->fields['entity']);
 	// unset($object->fields['entity']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
@@ -435,6 +441,7 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	unset($object->fields['entity']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 
@@ -640,7 +647,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		if (empty($reshook)) {
 			// Send
 			if (empty($user->socid)) {
-				print dolGetButtonAction('', $langs->trans('SendMail'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&token='.newToken().'&mode=init#formmailbeforetitle');
+				$params = [];
+				if ($object->mail == '' || $user->email == '') {
+					$params = ['attr' => ['classOverride' => 'butActionRefused', 'href' => '#']];
+				}
+				print dolGetButtonAction('', $langs->trans('SendMail'), 'default', $_SERVER["PHP_SELF"].'?id='.
+				$object->id.'&action=presend&token='.newToken().'&mode=init#formmailbeforetitle', '', 1, $params);
 			}
 
 			if (empty($user->socid)) {
@@ -842,6 +854,23 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if ($action == 'presendSms') {
 		include DOL_DOCUMENT_ROOT.'/custom/creche/smsform.php';
 
+	}
+
+	if ($action == 'sendSms') {
+		$msg = GETPOST('msg');
+		
+		$selectRef = "SELECT ref FROM " . $db->prefix() . "actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+		$refReq = $db->query($selectRef);
+		$refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
+		$refLast++; // faire +1 à la dernière ref
+	
+		$sql = "INSERT INTO " . $db->prefix() . "actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
+		VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 69, 'CRECHE_FAMILLE_SMS', 'SMS', '" 
+		. $db->escape($msg) . "', " . $object->id . ", 'famille')";
+		$req = $db->query($sql);
+	
+		header('Location: '.$_SERVER["PHP_SELF"].'?id=' . $object->id);
+		exit;
 	}
 }
 
