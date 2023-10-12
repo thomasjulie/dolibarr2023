@@ -36,6 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/creche/class/enfants.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche_enfants.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/core/modules/creche/doc/pdf_contrats.php';
 
 // load module libraries
 require_once __DIR__.'/class/contrats.class.php';
@@ -114,6 +115,113 @@ if (!$permissiontoread) accessforbidden();
  * Actions
  */
 
+if ($action == 'sendEmail') { // Envoie du contrat par email
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_contrats WHERE rowid = " . GETPOST('id');
+	$req = $db->query($sql);
+	$contrat = $db->fetch_object($req);
+	$dated = new DateTime($contrat->date_start);
+	$url = "/usr/share/dolibarr/documents/creche/contrats/" . $contrat->rowid . "/contrat_" . $dated->format('Y_m_d') . ".pdf";
+	$file = basename($url);
+
+	$mails = array();
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_famille WHERE rowid = " . $enfant->fk_famille;
+	$req = $db->query($sql);
+	$famille = $db->fetch_object($req);
+	if ($famille->mail != '') { // Récupérer le mail de la famille
+		$mails[] = $famille->mail;
+	}
+	
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_parents WHERE fk_famille = " . $enfant->fk_famille;
+	$req = $db->query($sql);
+	while ($parent = $db->fetch_object($req)) { // Récupérer les mails des parents
+		if ($parent->mail != '') {
+			$mails[] = $parent->mail;
+		}
+	}
+
+	include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
+	$formmail = new FormMail($db);
+	$formmail->trackid = $trackid;
+	$formmail->add_attached_files($url, $file, dol_mimetype($file));
+	
+	
+	require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+	$attachedfiles = $formmail->get_attached_files();
+	$filepath = $attachedfiles['paths'];
+	$filename = $attachedfiles['names'];
+	$mimetype = $attachedfiles['mimes'];
+	
+	$sendto = implode(',', $mails);
+	$subject = "Votre contrat crèche";
+	$message = "Voici votre contrat crèche pour votre enfant";
+	$from = $user->email;
+	
+	$mailfile = new CMailFile($subject, $sendto, $from, $message, $filepath, $mimetype, $filename);
+	
+	if (!empty($mailfile->error) || !empty($mailfile->errors)) {
+		setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+	} else {
+		$result = $mailfile->sendfile();
+		if ($result) {
+			$mesg = $langs->trans('MailSuccessfulySent', $mailfile->getValidAddress($from, 2), $mailfile->getValidAddress($sendto, 2));
+			setEventMessages($mesg, null, 'mesgs');
+			
+			$moreparam = '';
+			if (isset($paramname2) || isset($paramval2)) {
+				$moreparam .= '&'.($paramname2 ? $paramname2 : 'mid').'='.$paramval2;
+			}
+			
+			$selectRef = "SELECT ref FROM " . $db->prefix() . "actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+			$refReq = $db->query($selectRef);
+			$refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
+			$refLast++; // faire +1 à la dernière ref
+			$sql = "INSERT INTO " . $db->prefix() . "actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype) 
+			VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', 67, 'CRECHE_FAMILLE_MAIL', '" . $db->escape($subject) . "', '" 
+			. $db->escape($message) . "', " . $object->id . ", 'famille')";
+			$req = $db->query($sql);
+		} else {
+			$langs->load("other");
+			$mesg = '<div class="error">';
+			if (!empty($mailfile->error) || !empty($mailfile->errors)) {
+				$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+				if (!empty($mailfile->error)) {
+					$mesg .= '<br>'.$mailfile->error;
+				}
+				if (!empty($mailfile->errors) && is_array($mailfile->errors)) {
+					$mesg .= '<br>'.implode('<br>', $mailfile->errors);
+				}
+			} else {
+				$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+				if (!empty($conf->global->MAIN_DISABLE_ALL_MAILS)) {
+					$mesg .= '<br>Feature is disabled by option MAIN_DISABLE_ALL_MAILS';
+				} else {
+					$mesg .= '<br>Unkown Error, please refers to your administrator';
+				}
+			}
+			$mesg .= '</div>';
+			
+			setEventMessages($mesg, null, 'warnings');
+		}
+	}
+
+	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	exit;
+ }
+
+ if ($action == 'uploadPdf') { // Upload PDF signé
+	$dossier = "/usr/share/dolibarr/documents/creche/contrats/" . GETPOST('idContrat') . "/";
+	if (isset($_FILES['signed_contract'])) {
+		if (file_exists($dossier)) {
+			$fichier = GETPOST('final_path');
+			if(move_uploaded_file($_FILES['signed_contract']['tmp_name'], $fichier)) {
+				setEventMessages('Fichier uploader', null);
+			}
+		}
+	}
+	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	exit;
+ }
+
 
 
 /*
@@ -174,15 +282,21 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de début") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de fin") ?></th>
-					<?php if ($type == 'occasionnel'): ?>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Nombre de jours") ?></th>
-					<?php endif; ?>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures de présence") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Télécharger") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Contrat Signé") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Mail") ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php while ($res = $db->fetch_object($req)): 
 					$hours = json_decode($res->hours_of_day, true);
+					$dated = new DateTime($res->date_start);
+					$url = "/usr/share/dolibarr/documents/creche/contrats/" . $res->rowid ."/contrat_" . $dated->format('Y_m_d') . ".pdf";
+					if (!file_exists($url)) {
+						$pdf = new pdf_standard_contrats($db);
+						$pdf->write_file($res, $langs);
+					}
 					?>
 					<tr>
 						<td>
@@ -190,28 +304,43 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 						</td>
 						<td><?= $res->date_start ?></td>
 						<td><?= $res->date_end ?></td>
-						<?php if ($type == 'occasionnel'): ?>
-						<td><?= $res->nb_day ?></td>
-						<td>De <?= $hours[0]['start'] ?> à <?= $hours[0]['end'] ?></td>
-						<?php else: ?>
 						<td>
-							<?php if (isset($hours[1])): ?>
-								Lundi de <?= $hours[1]['start'] ?> à <?= $hours[1]['end'] ?><br />
-							<?php endif; ?>
-							<?php if (isset($hours[2])): ?>
-								Mardi de <?= $hours[2]['start'] ?> à <?= $hours[2]['end'] ?><br />
-							<?php endif; ?>
-							<?php if (isset($hours[3])): ?>
-								Mercredi de <?= $hours[3]['start'] ?> à <?= $hours[3]['end'] ?><br />
-							<?php endif; ?>
-							<?php if (isset($hours[4])): ?>
-								Jeudi de <?= $hours[4]['start'] ?> à <?= $hours[4]['end'] ?><br />
-							<?php endif; ?>
-							<?php if (isset($hours[5])): ?>
-								Vendredi de <?= $hours[5]['start'] ?> à <?= $hours[5]['end'] ?>
+							<?php if ($res->type == 'regulier'): ?>
+								<?php if (isset($hours[1])): ?>
+									Lundi de <?= $hours[1]['start'] ?> à <?= $hours[1]['end'] ?><br />
+								<?php endif; ?>
+								<?php if (isset($hours[2])): ?>
+									Mardi de <?= $hours[2]['start'] ?> à <?= $hours[2]['end'] ?><br />
+								<?php endif; ?>
+								<?php if (isset($hours[3])): ?>
+									Mercredi de <?= $hours[3]['start'] ?> à <?= $hours[3]['end'] ?><br />
+								<?php endif; ?>
+								<?php if (isset($hours[4])): ?>
+									Jeudi de <?= $hours[4]['start'] ?> à <?= $hours[4]['end'] ?><br />
+								<?php endif; ?>
+								<?php if (isset($hours[5])): ?>
+									Vendredi de <?= $hours[5]['start'] ?> à <?= $hours[5]['end'] ?>
+								<?php endif; ?>
 							<?php endif; ?>
 						</td>
-						<?php endif; ?>
+						<td>
+							<a class="butAction" 
+							href="/custom/creche/document.php?modulepart=creche&entity=<?= $enfant->entity ?>&file=<?= urlencode($url) ?>">PDF</a>
+						</td>
+						<td>
+							<form enctype="multipart/form-data" method="post">
+								<input type="hidden" name="final_path" value="<?= $url ?>" >
+								<input type="hidden" name="token" value="<?= newToken() ?>" >
+								<input type="hidden" name="action" value="uploadPdf" >
+								<input type="hidden" name="idContrat" value="<?= $res->rowid ?>" >
+								<input type="file" name="signed_contract" accept=".pdf" /><br />
+								<input class="butAction" type="submit" value="Valider">
+							</form>
+						</td>
+						<td>
+						<a class="butAction" 
+							href="/custom/creche/enfant_contrats.php?idEnfant=<?= $enfant->id ?>&action=sendEmail&id=<?= $res->rowid ?>">Email</a>
+						</td>
 					</tr>
 				<?php endwhile; ?>
 			</tbody>

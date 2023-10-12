@@ -117,21 +117,14 @@ if (!$permissiontoread) accessforbidden();
  if ($action == 'create') {
 	$date_start = GETPOST('date_start');
 	$date_end = GETPOST('date_end');
+	$$hours_of_day = '';
+	$days_of_week = '';
 
 	$sql = "INSERT INTO " . $db->prefix() . "creche_contrats 
-	(fk_enfants, entity, type, date_start, date_end, nb_day, days_of_week, hours_of_day, date_created)
+	(fk_enfants, entity, type, date_start, date_end, days_of_week, hours_of_day, date_created)
 	VALUES (" . $enfant->id . ", " . $enfant->entity . ", '" . $type . "', '" . $date_start . "', '" . $date_end . "', ";
 
-	if ($type == 'occasionnel') {
-		$nb_day = GETPOST('nb_day');
-		$tmpHours = array(
-			0 => array(
-				'start' => GETPOST('hours_start'),
-				'end' => GETPOST('hours_end')
-			)
-		);
-		$hours_of_day = json_encode($tmpHours);
-	} else {
+	if ($type == 'regulier') {
 		$nb_day = 'NULL';
 		$day_1 = null;
 		$day_2 = null;
@@ -139,46 +132,47 @@ if (!$permissiontoread) accessforbidden();
 		$day_4 = null;
 		$day_5 = null;
 		$tmpHours = array();
-		$days_of_week = array();
+		$tmpDays = array();
 		if (GETPOST('hours_of_day_start_1') != '' && GETPOST('hours_of_day_end_1') != '') {
 			$tmpHours[1] = array(
 				'start' => GETPOST('hours_of_day_start_1'),
 				'end' => GETPOST('hours_of_day_end_1')
 			);
-			$days_of_week[] = 1;
+			$tmpDays[] = 1;
 		}
 		if (GETPOST('hours_of_day_start_2') != '' && GETPOST('hours_of_day_end_2') != '') {
 			$tmpHours[2] = array(
 				'start' => GETPOST('hours_of_day_start_2'),
 				'end' => GETPOST('hours_of_day_end_2')
 			);
-			$days_of_week[] = 2;
+			$tmpDays[] = 2;
 		}
 		if (GETPOST('hours_of_day_start_3') != '' && GETPOST('hours_of_day_end_3') != '') {
 			$tmpHours[3] = array(
 				'start' => GETPOST('hours_of_day_start_3'),
 				'end' => GETPOST('hours_of_day_end_3')
 			);
-			$days_of_week[] = 3;
+			$tmpDays[] = 3;
 		}
 		if (GETPOST('hours_of_day_start_4') != '' && GETPOST('hours_of_day_end_4') != '') {
 			$tmpHours[4] = array(
 				'start' => GETPOST('hours_of_day_start_4'),
 				'end' => GETPOST('hours_of_day_end_4')
 			);
-			$days_of_week[] = 4;
+			$tmpDays[] = 4;
 		}
 		if (GETPOST('hours_of_day_start_5') != '' && GETPOST('hours_of_day_end_5') != '') {
 			$tmpHours[5] = array(
 				'start' => GETPOST('hours_of_day_start_5'),
 				'end' => GETPOST('hours_of_day_end_5')
 			);
-			$days_of_week[] = 5;
+			$tmpDays[] = 5;
 		}
 		$hours_of_day = json_encode($tmpHours);
+		$days_of_week = implode(';', $tmpDays);
 	}
 
-	$sql .= $nb_day . ", '" . implode(';', $days_of_week) . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "')";
+	$sql .= "'" . $days_of_week . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "')";
 	$req = $db->query($sql);
 
 	// echo '<pre>';var_dump($tmpHours, $hours_of_day, implode(';', $days_of_week), $sql);echo '</pre>';
@@ -249,32 +243,7 @@ print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv(
 					<input type="date" name="date_end">
 				</td>
 			</tr>
-			<?php if ($type == 'occasionnel'): ?>
-				<tr>
-					<td class="fieldrequired">
-						Nombre de jours
-					</td>
-					<td>
-						<input type="number" name="nb_day">
-					</td>
-				</tr>
-				<tr>
-					<td class="fieldrequired">
-						Heure d'arrivée
-					</td>
-					<td>
-						<input type="time" name="hours_start" />
-					</td>
-				</tr>
-				<tr>
-					<td class="fieldrequired">
-						Heure de départ
-					</td>
-					<td>
-						<input type="time" name="hours_end" />
-					</td>
-				</tr>
-			<?php else: ?>
+			<?php if ($type == 'regulier'): ?>
 				<!-- <tr>
 					<td>
 						Jours de la semaine
