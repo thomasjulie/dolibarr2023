@@ -251,19 +251,26 @@ class ActionsCreche extends CommonHookActions
 					return 1;
 				} elseif ($parameters['field'] == 'entity' && $parameters['currentcontext'] == 'famillecard') {
 					$currentEntity = getEntity('famille', 0);
-					$sql = "SELECT rowid, label  
-					FROM " . $this->db->prefix() . "entity WHERE rowid != 1";
-					$req = $this->db->query($sql);
+					
 					if ($currentEntity == 1) {
+						$sql = "SELECT rowid, label  
+								FROM " . $this->db->prefix() . "entity WHERE rowid != 1";
+						$req = $this->db->query($sql);
+
 						$out = '<select class="flat" name="entity">';
 						$out .= '<option value="-1">Choisir une crèche</option>';
 						while ($option = $this->db->fetch_object($req)) {
-							$out .= '<option value="' . $option->rowid . '">' 
+							$out .= '<option value="' . $option->rowid . '"' . (GETPOST('entity')==$option->rowid?" selected":"") . '>' 
 							. ucfirst($option->label) . '</option>';
 						}
 						$out .= '</select>';
 					} else {
+						$sql = "SELECT label  
+								FROM " . $this->db->prefix() . "entity WHERE rowid = " . $currentEntity;
+						$req = $this->db->query($sql);
+
 						$out = '<input type="hidden" name="entity" value="' . $currentEntity . '">';
+						$out .= $this->db->fetch_object($req)->label;
 					}
 
 					echo $out;
