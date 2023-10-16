@@ -114,13 +114,13 @@ class Enfants extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
-		'fk_famille' => array('type'=>'int', 'label'=>'Fkfamille', 'enabled'=>'1', 'position'=>15, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx',),
+		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1,),
+		'fk_famille' => array('type'=>'int', 'label'=>'Fkfamille', 'enabled'=>'1', 'position'=>15, 'notnull'=>1, 'visible'=>1, 'css'=>'maxwidth500 widthcentpercentminusxx',),
 		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>16, 'notnull'=>1, 'visible'=>-1,),
-		'genre' => array('type'=>'enum("fille","garcon")', 'label'=>'Genre', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-1,),
-		'nom' => array('type'=>'varchar(150)', 'label'=>'Nom', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>-1, 'searchall'=>1,),
-		'prenom' => array('type'=>'varchar(150)', 'label'=>'Prenom', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1, 'searchall'=>1,),
-		'date_naissance' => array('type'=>'date', 'label'=>'Datenaissance', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>-1,),
+		'genre' => array('type'=>'enum("fille","garcon")', 'label'=>'Genre', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>1,),
+		'nom' => array('type'=>'varchar(150)', 'label'=>'Nom', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>1, 'searchall'=>1,),
+		'prenom' => array('type'=>'varchar(150)', 'label'=>'Prenom', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>1, 'searchall'=>1,),
+		'date_naissance' => array('type'=>'date', 'label'=>'Datenaissance', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>1,),
 		'vaccination' => array('type'=>'tinyint(1)', 'label'=>'Vaccination', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-1,),
 		'droit_image' => array('type'=>'tinyint(1)', 'label'=>'Droitimage', 'enabled'=>'1', 'position'=>45, 'notnull'=>1, 'visible'=>-1,),
 		'infos_divers' => array('type'=>'text', 'label'=>'Infosdivers', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),

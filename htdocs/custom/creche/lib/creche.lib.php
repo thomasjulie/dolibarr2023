@@ -92,6 +92,14 @@ function validateMobilePhone($phone)
 }
 
 /**
+ * Controle code postal
+ */
+function validatePostalCode($postalCode)
+{
+	return preg_match("#^[0-9]{5}$#",$postalCode)	;
+}
+
+/**
  * Get the path for the documents of an object
  * 
  * @param int $objectType type of object (famille, parents, enfants, ...)

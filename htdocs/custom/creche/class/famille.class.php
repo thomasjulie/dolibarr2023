@@ -114,10 +114,10 @@ class Famille extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
-		'libelle' => array('type'=>'varchar(100)', 'label'=>'Libelle', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-1, 'searchall'=>1,),
-		'mail' => array('type'=>'varchar(150)', 'label'=>'Mail', 'enabled'=>'1', 'position'=>25, 'notnull'=>0, 'visible'=>-1, 'searchall'=>1,),
-		'tel_portable' => array('type'=>'varchar(20)', 'label'=>'Telportable', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>-1, 'searchall'=>1,),
+		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1,),
+		'libelle' => array('type'=>'varchar(100)', 'label'=>'Libelle', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>1, 'searchall'=>1,),
+		'mail' => array('type'=>'varchar(150)', 'label'=>'Mail', 'enabled'=>'1', 'position'=>25, 'notnull'=>0, 'visible'=>1, 'searchall'=>1,),
+		'tel_portable' => array('type'=>'varchar(20)', 'label'=>'Telportable', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>1, 'searchall'=>1,),
 		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>16, 'notnull'=>1, 'visible'=>-1,),
 		'fk_user_create' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fkusercreate', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx', 'csslist'=>'tdoverflowmax150',),
 		'date_create' => array('type'=>'datetime', 'label'=>'Datecreate', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-1,),

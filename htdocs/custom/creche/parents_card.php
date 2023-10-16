@@ -199,6 +199,7 @@ if (empty($reshook)) {
 	
 	$mail = GETPOST('mail');
 	$tel = GETPOST('tel_portable');
+	$code_postal = GETPOST('code_postal');
 	$submit = (GETPOST('add') != '') ? 'add' : 'save';
 	$msg = '';
 
@@ -219,6 +220,15 @@ if (empty($reshook)) {
 						$msg .= "<br />";
 					}
 					$msg .= 'Veuillez renseigner un numéro de téléphone portable valide (doit être composé de 10 chiffres ou 9 si utilisation de +33)';
+				}
+			}
+
+			if ($code_postal != '') {
+				if (!validatePostalCode($code_postal)) {
+					if ($msg != '') {
+						$msg .= "<br />";
+					}
+					$msg .= 'Veuillez renseigner un code postal valide';
 				}
 			}
 			// die;
@@ -346,6 +356,7 @@ if ($action == 'create') {
 
 	print '<input type="hidden" name="mdp" value="' . dol_hash(new_motDePasse()) .'">';
 	print '<input type="hidden" name="entity" value="' . $famille->entity . '">';
+	print '<input type="hidden" name="backtopage" value="/custom/creche/famille_parents.php?id=' . GETPOST('famid', 'int') . '">';
 
 	print dol_get_fiche_head(array(), '');
 

@@ -304,6 +304,7 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_updatesec" value="'.date('s').'">';
 
 	print '<input type="hidden" name="entity" value="' . $famille->entity . '">';
+	print '<input type="hidden" name="backtopage" value="/custom/creche/famille_enfants.php?id=' . GETPOST('famid', 'int') . '">';
 
 	print dol_get_fiche_head(array(), '');
 
