@@ -18,7 +18,7 @@ CREATE TABLE llx_creche_contrats(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid int AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	fk_enfants int NOT NULL, 
-	entity int NOT NULL, 
+	entity int DEFAULT 1 NOT NULL, 
 	type varchar(100) NOT NULL, 
 	date_start date NOT NULL, 
 	date_end date NOT NULL, 
@@ -26,6 +26,7 @@ CREATE TABLE llx_creche_contrats(
 	hours_of_day varchar(250) NOT NULL, 
 	date_created datetime NOT NULL, 
 	date_signed datetime, 
-	file_path varchar(250)
+	file_path varchar(250), 
+	dossier_complet int NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

@@ -121,7 +121,7 @@ if (!$permissiontoread) accessforbidden();
 	$days_of_week = '';
 
 	$sql = "INSERT INTO " . $db->prefix() . "creche_contrats 
-	(fk_enfants, entity, type, date_start, date_end, days_of_week, hours_of_day, date_created)
+	(fk_enfants, entity, type, date_start, date_end, days_of_week, hours_of_day, date_created, dossier_complet)
 	VALUES (" . $enfant->id . ", " . $enfant->entity . ", '" . $type . "', '" . $date_start . "', '" . $date_end . "', ";
 
 	if ($type == 'regulier') {
@@ -172,10 +172,11 @@ if (!$permissiontoread) accessforbidden();
 		$days_of_week = implode(';', $tmpDays);
 	}
 
-	$sql .= "'" . $days_of_week . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "')";
+	$sql .= "'" . $days_of_week . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "', 0)";
 	$req = $db->query($sql);
 
-	// echo '<pre>';var_dump($tmpHours, $hours_of_day, implode(';', $days_of_week), $sql);echo '</pre>';
+	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	exit;
 }
 
 
@@ -220,7 +221,7 @@ print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv(
 </form><br />
 
 <?php if ($action == 'choose_type' && $type != ''): ?>
-	<form method="post" action="/custom/creche/enfant_contrats.php?idEnfant=<?= $enfant->id ?>">
+	<form method="post">
 	<input type="hidden" name="action" value="create">
 	<input type="hidden" name="token" value="<?= newToken() ?>">
 	<input type="hidden" name="type" value="<?= $type ?>">

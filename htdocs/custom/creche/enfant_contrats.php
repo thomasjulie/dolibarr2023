@@ -221,6 +221,21 @@ if ($action == 'sendEmail') { // Envoie du contrat par email
 	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
 	exit;
  }
+ 
+ if ($action == 'dossierComplet') { 
+	if (GETPOST('dossier_complet') == 1) {
+		$complet = 1;
+	} else {
+		$complet = 0;
+	}
+	$sql = "UPDATE " . $db->prefix() . "creche_contrats 
+			SET dossier_complet = " . $complet . " 
+			WHERE rowid = " . GETPOST('id');
+	$req = $db->query($sql);
+
+	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	exit;
+ }
 
 
 
@@ -282,10 +297,11 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de début") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de fin") ?></th>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures de présence") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures de <br /> présence") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Télécharger") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Contrat Signé") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Mail") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Dossier <br /> complet") ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -333,13 +349,22 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 								<input type="hidden" name="token" value="<?= newToken() ?>" >
 								<input type="hidden" name="action" value="uploadPdf" >
 								<input type="hidden" name="idContrat" value="<?= $res->rowid ?>" >
-								<input type="file" name="signed_contract" accept=".pdf" /><br />
+								<input type="file" name="signed_contract" accept=".pdf" style="width: 150px" /><br />
 								<input class="butAction" type="submit" value="Valider">
 							</form>
 						</td>
 						<td>
 						<a class="butAction" 
 							href="/custom/creche/enfant_contrats.php?idEnfant=<?= $enfant->id ?>&action=sendEmail&id=<?= $res->rowid ?>">Email</a>
+						</td>
+						<td>
+							<form method="post">
+								<input type="hidden" name="token" value="<?= newToken() ?>" >
+								<input type="hidden" name="action" value="dossierComplet" >
+								<input type="hidden" name="id" value="<?= $res->rowid ?>" >
+								<input type="checkbox" name="dossier_complet" value="1" <?= $res->dossier_complet == 1 ? 'checked' : '' ?>
+								 onchange="this.form.submit()">
+							</form>
 						</td>
 					</tr>
 				<?php endwhile; ?>

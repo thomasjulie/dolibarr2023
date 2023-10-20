@@ -114,17 +114,18 @@ class Contrats extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid' => array('type'=>'int', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
-		'fk_enfants' => array('type'=>'int', 'label'=>'Fkenfants', 'enabled'=>'1', 'position'=>15, 'notnull'=>1, 'visible'=>-1, 'css'=>'maxwidth500 widthcentpercentminusxx',),
-		'entity' => array('type'=>'int', 'label'=>'Entity', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-2, 'index'=>1,),
-		'type' => array('type'=>'varchar(100)', 'label'=>'Type', 'enabled'=>'1', 'position'=>25, 'notnull'=>1, 'visible'=>-1,),
-		'date_start' => array('type'=>'date', 'label'=>'Datestart', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1,),
-		'date_end' => array('type'=>'date', 'label'=>'Dateend', 'enabled'=>'1', 'position'=>35, 'notnull'=>1, 'visible'=>-1,),
-		'days_of_week' => array('type'=>'varchar(100)', 'label'=>'Daysofweek', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>-1,),
-		'hours_of_day' => array('type'=>'varchar(250)', 'label'=>'Hoursofday', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
-		'date_created' => array('type'=>'datetime', 'label'=>'Datecreated', 'enabled'=>'1', 'position'=>55, 'notnull'=>1, 'visible'=>-1,),
-		'date_signed' => array('type'=>'datetime', 'label'=>'Datesigned', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>-1,),
-		'file_path' => array('type'=>'varchar(250)', 'label'=>'Filepath', 'enabled'=>'1', 'position'=>65, 'notnull'=>0, 'visible'=>-1,),
+		"rowid" => array("type"=>"int", "label"=>"TechnicalID", "enabled"=>"1", 'position'=>10, 'notnull'=>1, "visible"=>"-1",),
+		"fk_enfants" => array("type"=>"int", "label"=>"Fkenfants", "enabled"=>"1", 'position'=>15, 'notnull'=>1, "visible"=>"-1", "css"=>"maxwidth500 widthcentpercentminusxx",),
+		"entity" => array("type"=>"int", "label"=>"Entity", "enabled"=>"1", 'position'=>20, 'notnull'=>1, "visible"=>"-2", "index"=>"1",),
+		"type" => array("type"=>"varchar(100)", "label"=>"Type", "enabled"=>"1", 'position'=>25, 'notnull'=>1, "visible"=>"-1",),
+		"date_start" => array("type"=>"date", "label"=>"Datestart", "enabled"=>"1", 'position'=>30, 'notnull'=>1, "visible"=>"-1",),
+		"date_end" => array("type"=>"date", "label"=>"Dateend", "enabled"=>"1", 'position'=>35, 'notnull'=>1, "visible"=>"-1",),
+		"days_of_week" => array("type"=>"varchar(100)", "label"=>"Daysofweek", "enabled"=>"1", 'position'=>45, 'notnull'=>0, "visible"=>"-1",),
+		"hours_of_day" => array("type"=>"varchar(250)", "label"=>"Hoursofday", "enabled"=>"1", 'position'=>50, 'notnull'=>1, "visible"=>"-1",),
+		"date_created" => array("type"=>"datetime", "label"=>"Datecreated", "enabled"=>"1", 'position'=>55, 'notnull'=>1, "visible"=>"-1",),
+		"date_signed" => array("type"=>"datetime", "label"=>"Datesigned", "enabled"=>"1", 'position'=>60, 'notnull'=>0, "visible"=>"-1",),
+		"file_path" => array("type"=>"varchar(250)", "label"=>"Filepath", "enabled"=>"1", 'position'=>65, 'notnull'=>0, "visible"=>"-1",),
+		"dossier_complet" => array("type"=>"int", "label"=>"DossierComplet", "enabled"=>"1", 'position'=>70, 'notnull'=>1, "visible"=>"-2",),
 	);
 	public $rowid;
 	public $fk_enfants;
@@ -137,6 +138,7 @@ class Contrats extends CommonObject
 	public $date_created;
 	public $date_signed;
 	public $file_path;
+	public $dossier_complet;
 	// END MODULEBUILDER PROPERTIES
 
 
