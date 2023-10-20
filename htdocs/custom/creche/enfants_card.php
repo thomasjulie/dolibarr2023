@@ -82,11 +82,11 @@ dol_include_once('/creche/lib/creche_enfants.lib.php');
 // Load translation files required by the page
 $langs->loadLangs(array("creche@creche", "other"));
 
+
 // Get parameters
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
 $lineid   = GETPOST('lineid', 'int');
-
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');
 $cancel = GETPOST('cancel', 'aZ09');
@@ -220,8 +220,6 @@ if (empty($reshook)) {
 }
 
 
-
-
 /*
  * View
  */
@@ -288,7 +286,6 @@ if ($action == 'create') {
 	print '<input type="hidden" name="date_createhour" value="'.date('H').'">';
 	print '<input type="hidden" name="date_createmin" value="'.date('i').'">';
 	print '<input type="hidden" name="date_createsec" value="'.date('s').'">';
-
 	print '<input type="hidden" name="date_update" value="'.date('Y-m-d H:i:s').'">';
 	print '<input type="hidden" name="date_updateyear" value="'.date('Y').'">';
 	print '<input type="hidden" name="date_updatemonth" value="'.date('m').'">';
@@ -384,6 +381,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$head = enfantsPrepareHead($object);
 
 	print dol_get_fiche_head($head, 'card', $langs->trans("Enfants"), -1, $object->picto, 0, '', '', 0, '', 1);
+
 
 	if ($object->code_facture != null || $object->code_facture == '') {
 		$code = '90';
@@ -584,7 +582,29 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			if ($object->status == $object::STATUS_VALIDATED) {
 				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
 			}
+			// http://dolibarr17.fr/custom/creche/evenement.php?token=229cc38d1c0bbba25ac16abe384b0552&famid=1&actioncode=CRECHE_FAMILLE&child=2
+			$link_event = "/custom/creche/evenement.php";
+			$actioncode = [
+				'AC_OTH_AUTO',
+				'CRECHE_FAMILLE',
+				'FAMILLE_CRECHE',
+				'FAMILLE_CRECHE_MAIL',
+				'FAMILLE_CRECHE_SMS',
+				'CRECHE_GLOBAL'
+			];
+			$page_pre = $_SERVER['HTTP_REFERER'];
+			// Si origine liste enfant
+			if($page_pre == 'http://dolibarr17.fr/custom/creche/enfants_list.php?idmenu=587&mainmenu=creche&leftmenu=') {
+				$origin = '&origin=enfant';
+			} elseif($page_pre == 'http://dolibarr17.fr/custom/creche/famille_enfants.php?id='.$object->id) {
+				$origin = '&origin=famille';
+			} else {
+				$origin = null;
+			}
 
+			print dolGetButtonAction('', $langs->trans('Repas'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=repas'.$origin, $permissiontoadd);
+			print dolGetButtonAction('', $langs->trans('Sieste'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=sieste'.$origin, $permissiontoadd);
+			print dolGetButtonAction('', $langs->trans('Couche'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=couche'.$origin, $permissiontoadd);
 			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
 
 			/*
