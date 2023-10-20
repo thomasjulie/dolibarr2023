@@ -115,7 +115,7 @@ ALTER TABLE llx_commande_fournisseur_dispatch ADD INDEX idx_commande_fournisseur
 UPDATE llx_societe_account SET site = 'dolibarr_website' WHERE fk_website > 0 AND site IS NULL;
 ALTER TABLE llx_societe_account MODIFY COLUMN site varchar(128) NOT NULL;
 
-ALTER TABLE llx_accounting_account MODIFY COLUMN pcg_type varchar(32);
+ALTER TABLE llx_accounting_account MODIFY COLUMN pcg_type varchar(60);
 
 -- Drop the composite unique index that exists on llx_links to rebuild a new one with objecttype included.
 -- The old design did not allow same label on different objects with same id.
@@ -135,3 +135,7 @@ insert into llx_c_invoice_subtype (entity, fk_country, code, label, active) VALU
 insert into llx_c_invoice_subtype (entity, fk_country, code, label, active) VALUES (1, 102, '11.4', 'Πιστωτικό Στοιχ. Λιανικής', 1);
 
 ALTER TABLE llx_prelevement_lignes ADD COLUMN fk_user integer NULL;
+
+ALTER TABLE llx_hrm_evaluationdet ADD COLUMN comment TEXT;
+
+	
