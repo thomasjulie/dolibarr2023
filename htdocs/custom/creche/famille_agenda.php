@@ -272,7 +272,7 @@ if ($object->id > 0) {
 					<tr>
 						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
 							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
-							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->label ?></td>
+							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= ucfirst($res->label) ?></td>
 						<td class="<?= ($res->code == 'CRECHE_FAMILLE' 
 							|| $res->code == 'CRECHE_FAMILLE_MAIL' 
 							|| $res->code == 'CRECHE_FAMILLE_SMS') ? 'msg_creche' : 'msg_famille' ?>"><?= $res->note ?></td>

@@ -50,6 +50,8 @@ $actioncode = GETPOST('actioncode');
 $label = GETPOST('label');
 $description = GETPOST('note');
 $child = GETPOST('child', 'int');
+$origin = GETPOST('origin');
+
 
 // Initialize technical objects
 $object = new Famille($db);
@@ -79,7 +81,7 @@ if (!isModEnabled("creche")) {
 if (!$permissiontoread) accessforbidden();
 
 
-if ($action == 'add') {
+if ($action == 'add' && GETPOSTISSET('add')) {
     $sql = "SHOW TABLE STATUS LIKE '" . $db->prefix() . "actioncomm'";
     $req = $db->query($sql);
     $id = $db->fetch_object($req)->Auto_increment;
@@ -108,7 +110,6 @@ if ($action == 'add') {
         $extraparams = 'enfant:' . $child;
         $extraparamsField = 'extraparams';
     }
-    
     $sql = "INSERT INTO " . $db->prefix() . "actioncomm (ref, datep, fk_action, code, label, note, fk_element, elementtype" . 
         ($extraparams != '' ? ", extraparams" : "") .") 
         VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', " . $actionCodeId . ", '" . $actioncode . "', '" . $db->escape($label) 
@@ -116,6 +117,26 @@ if ($action == 'add') {
     $req = $db->query($sql);
     header('Location: famille_agenda.php?id=' . $famid);
     exit;
+} else {
+    // Si appuie sur boutton annuler
+    if(GETPOST('cancel')) {
+        // Si GET origine existe
+        if(isset($origin)) {
+            // Si HTTP ou HTTPS
+            $scheme = $_SERVER["REQUEST_SCHEME"];
+            if($origin == 'famille') {
+                $return_url = ''.$scheme.'://dolibarr17.fr/custom/creche/famille_enfants.php?id='.$famid;
+                header('Location: '. $return_url);exit;
+            }
+            elseif($origin == 'enfant') {
+                $return_url = ''.$scheme.'://dolibarr17.fr/custom/creche/enfants_list.php?idmenu=587&mainmenu=creche&leftmenu=';
+                header('Location: '. $return_url);exit;
+            } else {
+                $return_url = ''.$scheme.'://dolibarr17.fr/custom/creche/famille_list.php?idmenu=580&mainmenu=creche&leftmenu=';
+                header('Location: '. $return_url);exit;
+            }
+        }
+    }
 }
 
 
@@ -131,6 +152,7 @@ $sql = "SELECT rowid, prenom
         WHERE fk_famille = " . $famid;
 $enfants = $db->query($sql);
 
+
 dol_set_focus("#label");
 
 if (!empty($conf->use_javascript_ajax)) {
@@ -139,7 +161,8 @@ if (!empty($conf->use_javascript_ajax)) {
         function setdatefields()
         {
             if ($("#fullday:checked").val() == null) {
-                $(".fulldaystarthour").removeAttr("disabled");
+                $(".fulldaystarthour").val(\''.date('H').'\');
+                $(".fulldaystartmin").val(\''.date('i').'\');
                 $(".fulldaystartmin").removeAttr("disabled");
                 $(".fulldayendhour").removeAttr("disabled");
                 $(".fulldayendmin").removeAttr("disabled");
@@ -150,8 +173,9 @@ if (!empty($conf->use_javascript_ajax)) {
                 $(".fulldayendhour").prop("disabled", true).val("23");
                 $(".fulldayendmin").prop("disabled", true).val("59");
                 $("#p2").removeAttr("disabled");
-            }
+            }       
         }
+
         $("#fullday").change(function() {
             console.log("setdatefields");
             setdatefields();
@@ -185,15 +209,15 @@ if (!empty($conf->use_javascript_ajax)) {
         if ($("#actioncode").val() == \'AC_RDV\') $("#dateend").addClass("fieldrequired");
         else $("#dateend").removeClass("fieldrequired");
         setdatefields();
-    })';
+        });';
     print '</script>'."\n";
 }
-
 print '<form name="formaction" action="'.$_SERVER['PHP_SELF'].'?famid=' . $famid . '" method="POST" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="add">';
 print '<input type="hidden" name="donotclearsession" value="1">';
 print '<input type="hidden" name="page_y" value="">';
+print '<input type="hidden" name="origin" value="'.$origin.'">';
 // Assigned to
 $listofuserid = array();
 $listofcontactid = array();
@@ -239,20 +263,44 @@ if (!empty($conf->global->AGENDA_USE_EVENT_TYPE)) {
 }
 
 // Enfant
-print '<tr><td class="nowrap">'.$langs->trans("Enfant concerné").'</td><td>';
-print '<select name="child" id="child" class="">';
-print '<option value="0"></option>';
-while ($enfant = $db->fetch_object($enfants)) {
-    print '<option value="' . $enfant->rowid . '">' . $enfant->prenom . '</option>';
+    print '<tr><td class="nowrap">'.$langs->trans("Enfant concerné").'</td><td>';
+    print '<select name="child">';
+    while($enfant = $enfants->fetch_object()) { ?>
+         <option value="<?= $enfant->rowid ?>"<?= ($enfant->rowid == $child) ? ' selected' : '' ?>><?= $enfant->prenom ?></option>
+    <?php } 
+    print '</select>';
+    print '</td></tr>';
+
+// Title
+$libelles = [
+    'repas' => 'Prise de repas',
+    'sieste' => 'Sieste',
+    'couche' => 'Changement de couche'
+];
+
+print '<tr><td class="nowrap">'.$langs->trans("Libellé").'</td><td>';
+print '<select name="label">';
+print '<option value="x"></option>';
+foreach ($libelles as $k => $libelle) {
+    if($k === GETPOST('label')) {
+        print '<option value="' . $k . '" selected="">' . $libelle. '</option>';
+    } else {
+        print '<option value="' . $k . '">' . $libelle. '</option>';
+    }
 }
 print '</select>';
 print '</td></tr>';
 
-// Title
-print '<tr><td'.(empty($conf->global->AGENDA_USE_EVENT_TYPE) ? ' class="fieldrequired titlefieldcreate"' : '').'>'.$langs->trans("Label").'</td><td><input type="text" id="label" name="label" class="soixantepercent" value="'.GETPOST('label').'"></td></tr>';
+// print '<tr><td'.(empty($conf->global->AGENDA_USE_EVENT_TYPE) ? ' class="fieldrequired titlefieldcreate"' : '').'>'.$langs->trans("Label").'</td><td><input type="text" id="label" name="label" class="soixantepercent" value="'.GETPOST('label').'"></td></tr>';
+
+
 
 // Full day
-print '<tr><td><span class="fieldrequired">'.$langs->trans("Date").'</span></td><td class="valignmiddle height30 small"><input type="checkbox" id="fullday" name="fullday" '.(GETPOST('fullday') ? ' checked' : '').'><label for="fullday">'.$langs->trans("EventOnFullDay").'</label>';
+
+print '<tr><td><span class="fieldrequired">'.$langs->trans("Date").'</span>
+</td><td class="valignmiddle height30 small">
+<input type="checkbox" id="fullday" name="fullday" '.(GETPOST('fullday') ? ' checked' : '').'>
+<label for="fullday">'.$langs->trans("EventOnFullDay").'</label>';
 print '</td></tr>';
 
 $datep = '';
@@ -261,10 +309,11 @@ $datef = '';
 // Date start / Date end
 print '<tr><td class="nowrap">';
 print '</td><td>';
-print $form->selectDate($datep, 'ap', 1, 1, 1, "action", 1, 2, 0, 'fulldaystart', '', '', '', 1, '', '', 'tzuserrel');
+print $form->selectDate($datep, 'ap', date('m'),date('d'),date('y'), "action", 1,1, 0, 'fulldaystart', '', '', '', 1, '', '', 'tzuserrel');
 print ' <span class="hideonsmartphone">&nbsp; &nbsp; - &nbsp; &nbsp;</span> ';
 print $form->selectDate($datef, 'p2', 1, 1, 1, "action", 1, 0, 0, 'fulldayend', '', '', '', 1, '', '', 'tzuserrel');
 print '</td></tr>';
+
 
 // Joindre un fichier
 print '<tr><td class="nowrap">'.$langs->trans("Joindre un fichier").'</td>';

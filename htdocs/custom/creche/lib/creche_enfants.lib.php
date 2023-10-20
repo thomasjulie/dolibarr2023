@@ -34,6 +34,7 @@ function enfantsPrepareHead($object)
 	$langs->load("creche@creche");
 
 	$showtabofpagecontact = 1;
+	$showtabofpageevent = 1;
 	$showtabofpagenote = 1;
 	$showtabofpagedocument = 1;
 	$showtabofpageagenda = 1;
@@ -52,6 +53,7 @@ function enfantsPrepareHead($object)
 	// 	$head[$h][2] = 'contact';
 	// 	$h++;
 	// }
+
 
 	if ($showtabofpagenote) {
 		if (isset($object->fields['note_public']) || isset($object->fields['note_private'])) {
@@ -87,10 +89,19 @@ function enfantsPrepareHead($object)
 		$h++;
 	}
 
+	if ($showtabofpageevent) {
+		$head[$h][0] = dol_buildpath("/creche/enfants_agenda.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("Événements");
+		$head[$h][2] = 'evenements';
+		$h++;
+	}
+
 	$head[$h][0] = dol_buildpath("/custom/creche/enfant_contrats.php", 1).'?idEnfant='.$object->id;
 	$head[$h][1] = $langs->trans("Contrats");
 	$head[$h][2] = 'contrats';
 	$h++;
+
+
 
 	// if ($showtabofpageagenda) {
 	// 	$head[$h][0] = dol_buildpath("/creche/enfants_agenda.php", 1).'?id='.$object->id;

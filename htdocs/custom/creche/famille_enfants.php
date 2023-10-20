@@ -99,7 +99,7 @@ $title = $langs->trans("Famille")." - ".$langs->trans('Enfants');
 llxHeader('', $title);
 
 $head = famillePrepareHead($fam);
-print dol_get_fiche_head($head, 'enfants', $langs->trans("Famille"), -1, $fam->picto, 0, '', '', 0, '', 1);
+// print dol_get_fiche_head($head, 'enfants', $langs->trans("Famille"), -1, $fam->picto, 0, '', '', 0, '', 1);
 
 $sql = "SELECT * 
 		FROM " . $db->prefix() . "creche_enfants 
@@ -141,7 +141,7 @@ dol_banner_tab($fam, 'ref', $linkback, 1, 'ref', 'libelle'); ?>
 								<?= $res->prenom . ' ' . $res->nom ?>
 							</a>
 						</td>
-						<td><?= $res->genre ?></td>
+						<td><?= ucfirst($res->genre) ?></td>
 						<td><?= $res->date_naissance ?></td>
 					</tr>
 				<?php endwhile; ?>
