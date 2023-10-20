@@ -99,7 +99,7 @@ $title = $langs->trans("Famille")." - ".$langs->trans('Enfants');
 llxHeader('', $title);
 
 $head = famillePrepareHead($fam);
-// print dol_get_fiche_head($head, 'enfants', $langs->trans("Famille"), -1, $fam->picto, 0, '', '', 0, '', 1);
+print dol_get_fiche_head($head, 'enfants', $langs->trans("Famille"), -1, $fam->picto, 0, '', '', 0, '', 1);
 
 $sql = "SELECT * 
 		FROM " . $db->prefix() . "creche_enfants 

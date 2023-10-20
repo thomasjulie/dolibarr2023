@@ -600,19 +600,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				'FAMILLE_CRECHE_SMS',
 				'CRECHE_GLOBAL'
 			];
-			$page_pre = $_SERVER['HTTP_REFERER'];
-			// Si origine liste enfant
-			if($page_pre == 'http://dolibarr17.fr/custom/creche/enfants_list.php?idmenu=587&mainmenu=creche&leftmenu=') {
-				$origin = '&origin=enfant';
-			} elseif($page_pre == 'http://dolibarr17.fr/custom/creche/famille_enfants.php?id='.$object->id) {
-				$origin = '&origin=famille';
-			} else {
-				$origin = null;
-			}
 
-			print dolGetButtonAction('', $langs->trans('Repas'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=repas'.$origin, $permissiontoadd);
-			print dolGetButtonAction('', $langs->trans('Sieste'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=sieste'.$origin, $permissiontoadd);
-			print dolGetButtonAction('', $langs->trans('Couche'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=couche'.$origin, $permissiontoadd);
+			print dolGetButtonAction('', $langs->trans('Repas'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=repas&origin=enfant', $permissiontoadd);
+			print dolGetButtonAction('', $langs->trans('Sieste'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=sieste&origin=enfant', $permissiontoadd);
+			print dolGetButtonAction('', $langs->trans('Couche'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=couche&origin=enfant', $permissiontoadd);
 			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
 
 			/*

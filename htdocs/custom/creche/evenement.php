@@ -120,21 +120,16 @@ if ($action == 'add' && GETPOSTISSET('add')) {
 } else {
     // Si appuie sur boutton annuler
     if(GETPOST('cancel')) {
-        // Si GET origine existe
-        if(isset($origin)) {
-            // Si HTTP ou HTTPS
-            $scheme = $_SERVER["REQUEST_SCHEME"];
-            if($origin == 'famille') {
-                $return_url = ''.$scheme.'://dolibarr17.fr/custom/creche/famille_enfants.php?id='.$famid;
-                header('Location: '. $return_url);exit;
-            }
-            elseif($origin == 'enfant') {
-                $return_url = ''.$scheme.'://dolibarr17.fr/custom/creche/enfants_list.php?idmenu=587&mainmenu=creche&leftmenu=';
-                header('Location: '. $return_url);exit;
-            } else {
-                $return_url = ''.$scheme.'://dolibarr17.fr/custom/creche/famille_list.php?idmenu=580&mainmenu=creche&leftmenu=';
-                header('Location: '. $return_url);exit;
-            }
+        if($origin == 'famille') {
+            $return_url = 'famille_agenda.php?id='.$famid;
+            header('Location: '. $return_url);exit;
+        }
+        elseif($origin == 'enfant') {
+            $return_url = 'enfants_card.php?id=' . GETPOST('child');
+            header('Location: '. $return_url);exit;
+        } else {
+            $return_url = 'famille_list.php';
+            header('Location: '. $return_url);exit;
         }
     }
 }
@@ -273,12 +268,13 @@ if (!empty($conf->global->AGENDA_USE_EVENT_TYPE)) {
 
 // Title
 $libelles = [
+    'autre' => 'Autre',
     'repas' => 'Prise de repas',
     'sieste' => 'Sieste',
     'couche' => 'Changement de couche'
 ];
 
-print '<tr><td class="nowrap">'.$langs->trans("Libellé").'</td><td>';
+print '<tr><td class="nowrap">'.$langs->trans("Label").'</td><td>';
 print '<select name="label">';
 print '<option value="x"></option>';
 foreach ($libelles as $k => $libelle) {

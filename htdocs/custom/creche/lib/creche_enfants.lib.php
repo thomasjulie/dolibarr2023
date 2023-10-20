@@ -88,14 +88,14 @@ function enfantsPrepareHead($object)
 		$head[$h][2] = 'document';
 		$h++;
 	}
-
+/*
 	if ($showtabofpageevent) {
 		$head[$h][0] = dol_buildpath("/creche/enfants_agenda.php", 1).'?id='.$object->id;
 		$head[$h][1] = $langs->trans("Événements");
 		$head[$h][2] = 'evenements';
 		$h++;
 	}
-
+*/
 	$head[$h][0] = dol_buildpath("/custom/creche/enfant_contrats.php", 1).'?idEnfant='.$object->id;
 	$head[$h][1] = $langs->trans("Contrats");
 	$head[$h][2] = 'contrats';

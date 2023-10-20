@@ -236,7 +236,7 @@ if ($object->id > 0) {
 				<tr>
 					<td class="nobordernopadding valignmiddle col-title"></td>
 					<td class="nobordernopadding valignmiddle right col-right">
-						<a class="btnTitle btnTitlePlus" href="/custom/creche/evenement.php?token=<?= newToken() ?>&famid=<?= $object->id ?>" title="Créer événement">
+						<a class="btnTitle btnTitlePlus" href="/custom/creche/evenement.php?token=<?= newToken() ?>&origin=famille&famid=<?= $object->id ?>" title="Créer événement">
 							<span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span>
 						</a>
 					</td>
