@@ -88,7 +88,7 @@ $hookmanager->initHooks(array('enfants_contrats')); 	// Note that conf->hooks_mo
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
-$enablepermissioncheck = 0;
+$enablepermissioncheck = 1;
 if ($enablepermissioncheck) {
 	$permissiontoread = $user->hasRight('creche', 'contrats', 'read');
 	$permissiontoadd = $user->hasRight('creche', 'contrats', 'write');

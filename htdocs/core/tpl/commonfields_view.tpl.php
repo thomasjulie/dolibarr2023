@@ -104,7 +104,7 @@ foreach ($object->fields as $key => $val) {
 				$out = $object->showOutputField($val, $key, $value, '', '', '', 0);
 				print showValueWithClipboardCPButton($out, 0, $out);
 			} else {
-				$reshook = $hookmanager->executeHooks('showFieldValue', array('field' => $key, 'type' => $val['type'], 'value' => $value));
+				$reshook = $hookmanager->executeHooks('infansCrecheShowFieldValue', array('field' => $key, 'type' => $val['type'], 'value' => $value));
 				if (empty($reshook)) {
 					print $object->showOutputField($val, $key, $value, '', '', '', 0);
 				}

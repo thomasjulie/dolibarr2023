@@ -2440,7 +2440,7 @@ function dol_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldi
 					$nophoto = img_picto('No photo', $prefix.$picto);
 				}
 				$actionHook = "edit"; 
-				$reshook = $hookmanager->executeHooks('displayImg', array('rowid' => $object->id), $morehtmlleft, $actionHook);
+				$reshook = $hookmanager->executeHooks('infansCrecheDisplayImg', array('rowid' => $object->id), $morehtmlleft, $actionHook);
 				if (empty($reshook)) {
 					$morehtmlleft .= '<!-- No photo to show -->';
 					$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"><div class="photoref">';
@@ -10530,7 +10530,7 @@ function getAdvancedPreviewUrl($modulepart, $relativepath, $alldata = 0, $param 
 			include_once(DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php');
 			$hookmanager = new HookManager($db);
 			$hookmanager->initHooks(array('documentCreche'));
-			$reshook = $hookmanager->executeHooks('getOutPutDir');
+			$reshook = $hookmanager->executeHooks('infansCrecheGetOutPutDir');
 			if (empty($reshook)) {
 				return array('target'=>'_blank', 'css'=>'documentpreview', 'url'=>DOL_URL_ROOT.'/document.php?modulepart='.$modulepart.'&attachment=0&file='.urlencode($relativepath).($param ? '&'.$param : ''), 'mime'=>dol_mimetype($relativepath));
 			} elseif ($reshook == 1) {

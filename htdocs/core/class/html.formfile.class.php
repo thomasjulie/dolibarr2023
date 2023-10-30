@@ -1364,7 +1364,7 @@ class FormFile
 					// Show file name with link to download
 					//print "XX".$file['name'];	//$file['name'] must be utf8
 					// echo '<pre>';var_dump($hookmanager);echo '</pre>';
-					$reshook = $hookmanager->executeHooks('getOutPutDir');
+					$reshook = $hookmanager->executeHooks('infansCrecheGetOutPutDir');
 					if (empty($reshook)) {
 						print '<a class="paddingright valignmiddle" href="'.DOL_URL_ROOT.'/document.php?modulepart='.$modulepart;
 					} elseif ($reshook == 1) {
@@ -1472,7 +1472,7 @@ class FormFile
 									$paramlink .= ($paramlink ? '&' : '').'attachment=1';
 								}
 
-								$reshook = $hookmanager->executeHooks('getOutPutDir');
+								$reshook = $hookmanager->executeHooks('infansCrecheGetOutPutDir');
 								if (empty($reshook)) {
 									$fulllink = $urlwithroot.'/document.php'.($paramlink ? '?'.$paramlink : '');
 								} elseif ($reshook == 1) {

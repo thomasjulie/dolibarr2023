@@ -67,7 +67,7 @@ if ($action == 'add' && !empty($permissiontoadd)) {
 		}
 
 		$actionHook = "edit";
-		$reshook = $hookmanager->executeHooks('setEntity', array('field' => $key, 'value' => $_POST['entity']), $object, $actionHook);
+		$reshook = $hookmanager->executeHooks('infansCrecheSetEntity', array('field' => $key, 'value' => $_POST['entity']), $object, $actionHook);
 
 		// Ignore special fields
 		if (in_array($key, array('rowid', 'entity', 'import_key'))) {
@@ -129,7 +129,7 @@ if ($action == 'add' && !empty($permissiontoadd)) {
 
 		//var_dump($key.' '.$value.' '.$object->fields[$key]['type']);
 		$actionHook = "edit";
-		$reshook = $hookmanager->executeHooks('inputFile', array('field' => $key, 'value' => $value), $object, $actionHook);
+		$reshook = $hookmanager->executeHooks('infansCrecheInputFile', array('field' => $key, 'value' => $value), $object, $actionHook);
 		if (empty($reshook)) {
 			$object->$key = $value;
 		}
@@ -276,7 +276,7 @@ if ($action == 'update' && !empty($permissiontoadd)) {
 		}
 
 		$actionHook = "edit";
-		$reshook = $hookmanager->executeHooks('inputFile', array('field' => $key, 'value' => $value), $object, $actionHook);
+		$reshook = $hookmanager->executeHooks('infansCrecheInputFile', array('field' => $key, 'value' => $value), $object, $actionHook);
 		if (empty($reshook)) {
 			$object->$key = $value;
 		}

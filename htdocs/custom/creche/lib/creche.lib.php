@@ -111,3 +111,45 @@ function getOutPutDir($objectType, $objectId)
 	global $dolibarr_main_data_root;
 	return $dolibarr_main_data_root . '/creche/' . strtolower($objectType) . '/' . $objectId;
 }
+
+function getNbDay($start, $end, $dayName)
+{
+	$daysOfWeek = array(
+		'monday' => 1,
+		'tuesday' => 2,
+		'wednesday' => 3,
+		'thursday' => 4,
+		'friday' => 5,
+	);
+	
+	$period = new DatePeriod(
+		new DateTime($start),
+		DateInterval::createFromDateString('next ' . $dayName),
+		(new DateTime($end))->modify('+1 day') // ajouter 1 jour à la date de fin car elle est exclue par défaut dans "datePeriod"
+	);
+	$nb = 0;
+	foreach ($period as $value) {
+		// echo '<pre>';var_dump($value->format('Y-m-d l'));echo '</pre>';
+		if ($value->format("N") == $daysOfWeek[$dayName]) {
+			$nb++;
+		}	
+	}
+	return $nb;
+}
+
+function getRefEvenement($db)
+{
+	$selectRef = "SELECT ref FROM " . $db->prefix() . "actioncomm WHERE ref REGEXP '^[0-9]+$' ORDER BY cast(ref AS unsigned) DESC LIMIT 0,1";
+    $refReq = $db->query($selectRef);
+    $refLast = (int)$db->fetch_object($refReq)->ref; // dernière ref
+    $refLast++; // faire +1 à la dernière ref
+	return $refLast;
+}
+
+function getActionCodeId ($db, $actioncode)
+{
+	$selectCode = "SELECT id FROM " . $db->prefix() . "c_actioncomm WHERE code = '" . $actioncode . "'";
+    $codeReq = $db->query($selectCode);
+    $actionCodeId = $db->fetch_object($codeReq)->id;
+	return $actionCodeId;
+}

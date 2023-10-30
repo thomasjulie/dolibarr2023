@@ -115,7 +115,12 @@ if ($action == 'add' && GETPOSTISSET('add')) {
         VALUES (" . $refLast . ", '" . date('Y-m-d H:i:s') . "', " . $actionCodeId . ", '" . $actioncode . "', '" . $db->escape($label) 
         . "', '" . $db->escape($description) . "', " . $famid . ", 'famille'" . ($extraparams != '' ? ", '$extraparams'" : "") .")";
     $req = $db->query($sql);
-    header('Location: famille_agenda.php?id=' . $famid);
+    if($origin == 'enfant') {
+        $return_url = '../../index.php';
+        header('Location: '. $return_url);exit;
+    } else {
+        header('Location: famille_agenda.php?id=' . $famid);
+    }
     exit;
 } else {
     // Si appuie sur boutton annuler
@@ -125,7 +130,7 @@ if ($action == 'add' && GETPOSTISSET('add')) {
             header('Location: '. $return_url);exit;
         }
         elseif($origin == 'enfant') {
-            $return_url = 'enfants_card.php?id=' . GETPOST('child');
+            $return_url = '../../index.php';
             header('Location: '. $return_url);exit;
         } else {
             $return_url = 'famille_list.php';

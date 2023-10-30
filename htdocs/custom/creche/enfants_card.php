@@ -590,20 +590,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			if ($object->status == $object::STATUS_VALIDATED) {
 				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
 			}
-			// http://dolibarr17.fr/custom/creche/evenement.php?token=229cc38d1c0bbba25ac16abe384b0552&famid=1&actioncode=CRECHE_FAMILLE&child=2
-			$link_event = "/custom/creche/evenement.php";
-			$actioncode = [
-				'AC_OTH_AUTO',
-				'CRECHE_FAMILLE',
-				'FAMILLE_CRECHE',
-				'FAMILLE_CRECHE_MAIL',
-				'FAMILLE_CRECHE_SMS',
-				'CRECHE_GLOBAL'
-			];
-
-			print dolGetButtonAction('', $langs->trans('Repas'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=repas&origin=enfant', $permissiontoadd);
-			print dolGetButtonAction('', $langs->trans('Sieste'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=sieste&origin=enfant', $permissiontoadd);
-			print dolGetButtonAction('', $langs->trans('Couche'), 'default', $link_event.'?token='.newToken().'&famid='.$object->fk_famille.'&actioncode='.$actioncode[1].'&child='.$object->id.'&label=couche&origin=enfant', $permissiontoadd);
+			
 			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
 
 			/*

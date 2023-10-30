@@ -105,7 +105,7 @@ foreach ($object->fields as $key => $val) {
 			print img_picto('', 'language', 'class="pictofixedwidth"');
 			print $formadmin->select_language($value, $key, 0, null, 1, 0, 0, 'minwidth300', 2);
 		} else {
-			$reshook = $hookmanager->executeHooks('showField', array('field' => $key, 'type' => $val['type'], 'value' => $value));
+			$reshook = $hookmanager->executeHooks('infansCrecheShowField', array('field' => $key, 'type' => $val['type'], 'value' => $value));
 			if (empty($reshook)) {
 				print $object->showInputField($val, $key, $value, '', '', '', 0);
 			}

@@ -126,7 +126,9 @@ class modCreche extends DolibarrModules
 				'documentCreche',
 				'familledocument',
 				'parentsdocument',
-				'enfantsdocument'
+				'enfantsdocument',
+				'pointage_creche',
+				'index'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',
@@ -345,6 +347,21 @@ class modCreche extends DolibarrModules
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', (3 * 10) + 2 + 1);
 		$this->rights[$r][1] = 'Delete Contrats object of Creche';
 		$this->rights[$r][4] = 'contrats';
+		$this->rights[$r][5] = 'delete';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (4 * 10) + 0 + 1);
+		$this->rights[$r][1] = 'Read pointage';
+		$this->rights[$r][4] = 'pointage';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (4 * 10) + 1 + 1);
+		$this->rights[$r][1] = 'Create/Update pointage';
+		$this->rights[$r][4] = 'pointage';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (4 * 10) + 2 + 1);
+		$this->rights[$r][1] = 'Delete pointage';
+		$this->rights[$r][4] = 'pointage';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 		
@@ -653,7 +670,17 @@ class modCreche extends DolibarrModules
 								'del' => true
 							)
 						)
-					)
+					),
+					'contrats' => array(			// Valeur utilisée dans getEntity()
+						'type' => 'object',
+						'input' => array(
+							'global' => array(
+								'showhide' => true,
+								'hide' => true,
+								'del' => true
+							)
+						)
+					),
 				),
 				'sharingmodulename' => array(			// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
 					'famille' => 'creche',

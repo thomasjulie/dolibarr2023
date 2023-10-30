@@ -175,11 +175,11 @@ class ActionsCreche extends CommonHookActions
 	}
 
 	// Modifier affichage des formulaires de création et de modification
-	public function showField($parameters, &$object, &$action, $hookmanager)
+	public function infansCrecheShowField($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 		
-		// echo '<pre>';var_dump('showField', $parameters);echo '</pre>';
+		// echo '<pre>';var_dump($parameters);echo '</pre>';
 		
 		$error = 0; // Error counter
 		if (in_array($parameters['currentcontext'], array('parentscard', 'enfantscard', 'famillecard'))) { 
@@ -292,7 +292,7 @@ class ActionsCreche extends CommonHookActions
 	}
 	
 	// Modifier affichage des cards
-	public function showFieldValue($parameters, &$object, &$action, $hookmanager)
+	public function infansCrecheShowFieldValue($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 		
@@ -347,7 +347,7 @@ class ActionsCreche extends CommonHookActions
 	}
 
 	// Upload fichier
-	public function inputFile($parameters, &$object, &$action, $hookmanager)
+	public function infansCrecheInputFile($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 
@@ -394,7 +394,7 @@ class ActionsCreche extends CommonHookActions
 	}
 	
 	// Afficher une image
-	public function displayImg($parameters, &$object, &$action, $hookmanager)
+	public function infansCrecheDisplayImg($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 
@@ -441,7 +441,7 @@ class ActionsCreche extends CommonHookActions
 	}
 	
 	// Trouver le bon chemin pour les documents
-	public function getOutPutDir($parameters, &$object, &$action, $hookmanager)
+	public function infansCrecheGetOutPutDir($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 
@@ -467,7 +467,7 @@ class ActionsCreche extends CommonHookActions
 	}
 	
 	// Enregistrer l'entité choisie
-	public function setEntity($parameters, &$object, &$action, $hookmanager)
+	public function infansCrecheSetEntity($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
 
@@ -478,6 +478,32 @@ class ActionsCreche extends CommonHookActions
 			if ($conf->creche->enabled) {
 				$field = $parameters['field'];
 				$object->$field = $parameters['value'];
+				return 1;
+			}
+		}
+		
+		
+		if (!$error) {
+			// $this->results = array('myreturn' => 999);
+			// $this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+	
+	// Modification de la page d'accueil
+	public function infansCrecheAccueil($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+		
+		// echo '<pre>';var_dump($parameters);echo '</pre>';
+		
+		$error = 0; // Error counter
+		if (in_array($parameters['currentcontext'], array('index'))) { 
+			if ($conf->creche->enabled) {
+				$this->results = array('true');
 				return 1;
 			}
 		}
