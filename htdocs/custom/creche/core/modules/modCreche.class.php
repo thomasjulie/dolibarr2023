@@ -128,7 +128,8 @@ class modCreche extends DolibarrModules
 				'parentsdocument',
 				'enfantsdocument',
 				'pointage_creche',
-				'index'
+				'index',
+				'facturescard'
 				//   'data' => array(
 				//       'hookcontext1',
 				//       'hookcontext2',
@@ -364,6 +365,21 @@ class modCreche extends DolibarrModules
 		$this->rights[$r][4] = 'pointage';
 		$this->rights[$r][5] = 'delete';
 		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (5 * 10) + 0 + 1);
+		$this->rights[$r][1] = 'Read Factures object of Creche';
+		$this->rights[$r][4] = 'factures';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (5 * 10) + 1 + 1);
+		$this->rights[$r][1] = 'Create/Update Factures object of Creche';
+		$this->rights[$r][4] = 'factures';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (5 * 10) + 2 + 1);
+		$this->rights[$r][1] = 'Delete Factures object of Creche';
+		$this->rights[$r][4] = 'factures';
+		$this->rights[$r][5] = 'delete';
+		$r++;
 		
 		/* END MODULEBUILDER PERMISSIONS */
 
@@ -501,6 +517,54 @@ class modCreche extends DolibarrModules
 			 'user' =>2,
 		);
 		/* END LEFTMENU LISTE ENFANTS */
+		/* LEFTMENU FACTURES */
+		$this->menu[$r++]=array(
+			 'fk_menu' =>'fk_mainmenu=creche',
+			 'type' =>'left',
+			 'titre' =>'Factures',
+			 'mainmenu' =>'creche',
+			 'leftmenu' =>'factures',
+			 'url' =>'/creche/factures_list.php',
+			 'langs' =>'creche@creche',
+			 'position' =>1000 + $r,
+			 'enabled' =>'$conf->creche->enabled',
+			 'perms' =>'$user->hasRight("creche", "factures", "read")',
+			 'target' =>'',
+			 'user' =>2,
+		);
+		/* END LEFTMENU FACTURES */
+		/* LEFTMENU LIST FACTURES */
+		$this->menu[$r++]=array(
+			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=factures',
+			 'type' =>'left',
+			 'titre' =>'Liste Factures',
+			 'mainmenu' =>'creche',
+			 'leftmenu' =>'creche_factures_list',
+			 'url' =>'/creche/factures_list.php',
+			 'langs' =>'creche@creche',
+			 'position' =>1000 + $r,
+			 'enabled' =>'$conf->creche->enabled',
+			 'perms' =>'$user->hasRight("creche", "factures", "read")',
+			 'target' =>'',
+			 'user' =>2,
+		);
+		/* END LEFTMENU LIST FACTURES */
+		/* LEFTMENU NEW FACTURES */
+		$this->menu[$r++]=array(
+			 'fk_menu' =>'fk_mainmenu=creche,fk_leftmenu=factures',
+			 'type' =>'left',
+			 'titre' =>'Nouvelle Facture',
+			 'mainmenu' =>'creche',
+			 'leftmenu' =>'creche_factures_new',
+			 'url' =>'/creche/factures_card.php?action=create',
+			 'langs' =>'creche@creche',
+			 'position' =>1000 + $r,
+			 'enabled' =>'$conf->creche->enabled',
+			 'perms' =>'$user->hasRight("creche", "factures", "write")',
+			 'target' =>'',
+			 'user' =>2,
+		);
+		/* END LEFTMENU NEW FACTURES */
 
 
 		/* END MODULEBUILDER LEFTMENU MYOBJECT */

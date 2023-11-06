@@ -21,6 +21,8 @@
  * \brief   Library files with common functions for Creche
  */
 
+use Illuminate\Support\Arr;
+
 /**
  * Prepare admin pages header
  *
@@ -112,15 +114,16 @@ function getOutPutDir($objectType, $objectId)
 	return $dolibarr_main_data_root . '/creche/' . strtolower($objectType) . '/' . $objectId;
 }
 
-function getNbDay($start, $end, $dayName)
+function getNbDay($db, $start, $end, $dayNum, $entity)
 {
 	$daysOfWeek = array(
-		'monday' => 1,
-		'tuesday' => 2,
-		'wednesday' => 3,
-		'thursday' => 4,
-		'friday' => 5,
+		1 => 'monday',
+		2 => 'tuesday',
+		3 => 'wednesday',
+		4 => 'thursday',
+		5 => 'friday',
 	);
+	$dayName = $daysOfWeek[$dayNum];
 	
 	$period = new DatePeriod(
 		new DateTime($start),
@@ -129,10 +132,30 @@ function getNbDay($start, $end, $dayName)
 	);
 	$nb = 0;
 	foreach ($period as $value) {
-		// echo '<pre>';var_dump($value->format('Y-m-d l'));echo '</pre>';
-		if ($value->format("N") == $daysOfWeek[$dayName]) {
-			$nb++;
+		if ($value->format("N") == $dayNum) {
+			$sql = "SELECT day FROM " . $db->prefix() . "creche_days_off 
+			WHERE entity IN (0," . $entity . ") AND day = '" . $value->format('Y-m-d') . "'";
+			$req = $db->query($sql);
+			$closed = $db->num_rows($req);
+			
+			if ($closed == 0) {
+				$nb++;
+			}
 		}	
+	}
+	return $nb;
+}
+
+function getNbMonth($db, $start, $end)
+{	
+	$period = new DatePeriod(
+		new DateTime($start . '-01'),
+		DateInterval::createFromDateString('1 month'),
+		new DateTime($end)
+	);
+	$nb = 0;
+	foreach ($period as $value) {
+		$nb++;	
 	}
 	return $nb;
 }
@@ -152,4 +175,75 @@ function getActionCodeId ($db, $actioncode)
     $codeReq = $db->query($selectCode);
     $actionCodeId = $db->fetch_object($codeReq)->id;
 	return $actionCodeId;
+}
+
+function getNextNumFac($db, $type = 'facture')
+{
+	if ($type == 'facture') {
+		$newNum = 'ICFAC-';
+	} else {
+		$newNum = 'ICAVO-';
+	}
+	
+	$sql = "SELECT num_fac, CAST(RIGHT(num_fac, 9) AS SIGNED) AS facOrder FROM " . $db->prefix() . "creche_factures 
+			WHERE num_fac LIKE '" . $newNum . "%' ORDER BY facOrder DESC";
+    $req = $db->query($sql);
+    $lastNum = $db->fetch_object($req)->facOrder;
+
+	$year = substr($lastNum, 0, 2);
+	$month = substr($lastNum, 2, 2);
+	if (date('y') != $year || date('m') != $month) {
+		$newNum .= date('ym') . '00001';
+	} else {
+		$newNum .= $lastNum + 1;
+	}
+	
+	return $newNum;
+}
+
+function calculPaje($db, $contratId, $month)
+{
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_contrats 
+			WHERE rowid = " . $contratId;
+    $req = $db->query($sql);
+	$contrat = $db->fetch_object($req);
+	$start = new DateTime($contrat->date_start);
+	
+	$days = explode(';', $contrat->days_of_week);
+	$nbDayWeek = ($contrat->type == 'occasionnel') ? 1 : count($days); // Nb de jours par semaine du contrat (de 1 à 5)
+	$sql = "SELECT price_ttc FROM " . $db->prefix() . "product 
+	WHERE ref = 'F" . $nbDayWeek . "J'";
+	$req = $db->query($sql);
+	$dailyPrice = $db->fetch_object($req)->price_ttc; // Prix journalier (prix service)
+	
+	if ($contrat->type == 'occasionnel') {
+		$sql = "SELECT id, ref, datep, fk_action, code, label, fk_element, elementtype 
+		FROM " . $db->prefix() . "actioncomm
+		WHERE code = 'CRECHE_POINTAGE' 
+		AND elementtype = 'enfants' 
+		AND fk_element = " . $contrat->fk_enfants . " 
+		AND label = 'arrivee' 
+		AND datep LIKE '" . $month . "%' ";
+		$req = $db->query($sql);
+		$nbDaysTotal = $db->num_rows($req);
+		$monthlyPrice = $nbDaysTotal * $dailyPrice; // Prix mensuel 
+		
+		return array($nbDaysTotal, $monthlyPrice);
+	} else {
+		$nbDays = array();
+		$nbDaysTotal = 0; // Nb de jours annuel
+		foreach ($days as $num) {
+			$nbDays[$num] = getNbDay($db, $contrat->date_start, $contrat->date_end, $num, $contrat->entity);
+			$nbDaysTotal += $nbDays[$num];
+		}
+
+		$nbMonth = getNbMonth($db, $start->format('Y-m'), $contrat->date_end); // Nb de mois sur le contrat (de 1 à 12)
+
+		$annualPrice = $nbDaysTotal * $dailyPrice; // Prix annuel
+		$monthlyPrice = $annualPrice / $nbMonth; // Prix mensuel (lissé)
+		
+		return array($nbDaysTotal / $nbMonth, $monthlyPrice);
+	}
+
+	
 }

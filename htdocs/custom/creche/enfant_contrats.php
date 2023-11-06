@@ -273,7 +273,7 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 
 // echo '<pre>';var_dump($enfantid, $enfant);echo '</pre>';
 ?>
-
+<link href="css/creche.css" type="text/css" rel="stylesheet">
 <div class="fichecenter">
 		<div class="underbanner clearboth"></div>
 		<table class="centpercent notopnoleftnoright table-fiche-title">
@@ -295,13 +295,13 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 			<thead>
 				<tr class="liste_titre">
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de début") ?></th>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Date de fin") ?></th>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures de <br /> présence") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Dates") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Télécharger") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Contrat Signé") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Mail") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Dossier <br /> complet") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Facturer") ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -318,8 +318,8 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 						<td>
 							<?= $res->type ?>
 						</td>
-						<td><?= $res->date_start ?></td>
-						<td><?= $res->date_end ?></td>
+						<td><?= 'De ' . (new DateTime($res->date_start))->format('d/m/y') . '<br /> à ' 
+						. (new DateTime($res->date_end))->format('d/m/y') ?></td>
 						<td>
 							<?php if ($res->type == 'regulier'): ?>
 								<?php if (isset($hours[1])): ?>
@@ -365,6 +365,12 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 								<input type="checkbox" name="dossier_complet" value="1" <?= $res->dossier_complet == 1 ? 'checked' : '' ?>
 								 onchange="this.form.submit()">
 							</form>
+						</td>
+						<td>
+							<a class="butAction btn_autre" 
+							href="/custom/creche/factures_card.php?action=create&token=<?= newToken() ?>&idContrat=<?= $res->rowid ?>">
+							Facturer
+							</a>
 						</td>
 					</tr>
 				<?php endwhile; ?>

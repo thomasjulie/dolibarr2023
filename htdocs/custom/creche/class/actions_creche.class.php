@@ -65,7 +65,8 @@ class ActionsCreche extends CommonHookActions
 	protected $booleanFields = array(
 		'notif',
 		'vaccination',
-		'droit_image'
+		'droit_image',
+		'paye'
 	);
 
 
@@ -179,10 +180,10 @@ class ActionsCreche extends CommonHookActions
 	{
 		global $conf, $user, $langs;
 		
-		// echo '<pre>';var_dump($parameters);echo '</pre>';
+		// echo '<pre>';var_dump($parameters['field'], $parameters['value']);echo '</pre><br />';
 		
 		$error = 0; // Error counter
-		if (in_array($parameters['currentcontext'], array('parentscard', 'enfantscard', 'famillecard'))) { 
+		if (in_array($parameters['currentcontext'], array('parentscard', 'enfantscard', 'famillecard', 'facturescard'))) { 
 			if ($conf->creche->enabled) {
 				if (strpos($parameters['type'], 'enum') !== false) {
 					$tmp = explode('(', $parameters['type']);
@@ -272,6 +273,44 @@ class ActionsCreche extends CommonHookActions
 						$out = '<input type="hidden" name="entity" value="' . $currentEntity . '">';
 						$out .= $this->db->fetch_object($req)->label;
 					}
+
+					echo $out;
+					return 1;
+				} elseif ($parameters['field'] == 'num_fac') {					
+					if ($action == 'create' && $parameters['value'] == '') {
+						$val = getNextNumFac($this->db);
+					} else {
+						$val = $parameters['value'];
+					}
+					$out = '<input readonly type="text" class="flat minwidth400 --success" name="num_fac" id="num_fac" 
+					maxlength="100" value="' . $val . '">';			
+
+					echo $out;
+					return 1;
+				} elseif ($parameters['field'] == 'fk_contrat') {		
+					if (GETPOST('idContrat') !== null && is_numeric(GETPOST('idContrat'))) {
+						$id = GETPOST('idContrat');
+						$readonly = ' readonly';
+					} else {
+						$id = '';
+						$readonly = '';
+					}
+					$out = '<input type="text"' . $readonly . ' class="flat maxwidth75 --success" name="fk_contrat" 
+					id="fk_contrat" value="' . $id .'">';
+
+					echo $out;
+					return 1;
+				} elseif ($parameters['field'] == 'total_ht') {	
+					list($nbDaysMonth, $monthlyPrice) = calculPaje($this->db, GETPOST('idContrat'), date('Y-m', strtotime('-1 month')));				
+					$out = '<input type="text" class="flat maxwidth75 --success maxwidthonsmartphone" 
+					name="total_ht" id="total_ht" value="' . round($monthlyPrice, 2) . '">';
+
+					echo $out;
+					return 1;
+				} elseif ($parameters['field'] == 'total_ttc') {	
+					list($nbDaysMonth, $monthlyPrice) = calculPaje($this->db, GETPOST('idContrat'), date('Y-m', strtotime('-1 month')));				
+					$out = '<input type="text" class="flat maxwidth75 --success maxwidthonsmartphone" 
+					name="total_ttc" id="total_ttc" value="' . round($monthlyPrice, 2) . '">';
 
 					echo $out;
 					return 1;
