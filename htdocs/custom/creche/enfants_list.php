@@ -77,6 +77,7 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche.lib.php';
 
 // load module libraries
 require_once __DIR__.'/class/enfants.class.php';
@@ -273,6 +274,12 @@ if (empty($reshook)) {
 	// if ($action == 'xxx' && $permissiontoxxx) ...
 }
 
+if ($massaction == 'facturer') {
+	require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
+	$factu = new Facture($db);
+
+	massCreateFac($db, GETPOST('toselect'), $factu);
+}
 
 
 /*
@@ -497,6 +504,9 @@ $arrayofmassactions = array(
 	//'builddoc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("PDFMerge"),
 	//'presend'=>img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),
 );
+if ($user->rights->facture->creer == 1) {
+	$arrayofmassactions['facturer'] = '<span class="fas fa-file-invoice-dollar pictofixedwidth"></span>' . $langs->trans("Facturer");
+}
 if (!empty($permissiontodelete)) {
 	$arrayofmassactions['predelete'] = img_picto('', 'delete', 'class="pictofixedwidth"').$langs->trans("Delete");
 }

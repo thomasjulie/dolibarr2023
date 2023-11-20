@@ -203,6 +203,28 @@ if (empty($reshook)) {
 	$submit = (GETPOST('add') != '') ? 'add' : 'save';
 	$msg = '';
 
+	if ($submit == 'add') { // Créer un Tier pour le 1er parent
+		$sql = "SELECT rowid FROM " . $db->prefix() . "creche_parents WHERE fk_famille = " . GETPOST('fk_famille', 'int');
+		$req = $db->query($sql);
+		$nbParent = 0;//$db->num_rows($req);
+		
+		if ($nbParent == 0) {
+			$name = GETPOST('prenom') . ' ' . GETPOST('nom');
+			$sql = "INSERT INTO " . $db->prefix() . "societe (nom, entity, address, zip, town, fk_pays, phone, email, socialnetworks, 
+			note_private, note_public, client, cond_reglement, tms, datec, fk_user_creat, fk_user_modif) VALUES ('" . $name . "', 
+			1, '" . GETPOST('adresse') . "', '" . GETPOST('code_postal') . "', '" . GETPOST('ville') . "', 1 
+			, '" . GETPOST('tel_portable') . "', '" . GETPOST('mail') . "', '[]', NULL, NULL, 3, 9, '" . date('Y-m-d H:i:s') . "'
+			, '" . date('Y-m-d H:i:s') . "', $user->id, $user->id)";
+			$req = $db->query($sql);
+
+			$last = $db->last_insert_id($db->prefix() . "societe");
+			$sql = "UPDATE " . $db->prefix() . "creche_famille SET fk_societe = " . $last . " WHERE rowid = " . GETPOST('fk_famille', 'int');
+			$req = $db->query($sql);
+			$sql = "UPDATE " . $db->prefix() . "societe SET code_client = '90" . strtoupper(GETPOST('nom')) . $last . "' WHERE rowid = " . $last;
+			$req = $db->query($sql);
+		} 
+	}
+
 	if (in_array($action, array('update', 'add'))) {
 		if (GETPOST('cancel') == '') { //Ne pas controller si on clic sur Annuler
 			if ($mail != '') {

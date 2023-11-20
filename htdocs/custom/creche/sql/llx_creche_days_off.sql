@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : mar. 17 oct. 2023 à 16:21
+-- Généré le : mar. 14 nov. 2023 à 09:25
 -- Version du serveur : 8.0.33
 -- Version de PHP : 7.3.31-1~deb10u5
 
@@ -68,7 +68,32 @@ INSERT INTO `llx_creche_days_off` (`rowid`, `entity`, `day`) VALUES
 (28, 0, '2024-08-20'),
 (29, 0, '2024-08-21'),
 (30, 0, '2024-08-22'),
-(31, 0, '2024-08-23');
+(31, 0, '2024-08-23'),
+(32, 2, '2024-05-13'),
+(33, 2, '2024-05-14'),
+(34, 2, '2024-05-15'),
+(35, 2, '2024-05-16'),
+(36, 2, '2024-05-17'),
+(37, 4, '2024-05-13'),
+(38, 4, '2024-05-14'),
+(39, 4, '2024-05-15'),
+(40, 4, '2024-05-16'),
+(41, 4, '2024-05-17'),
+(42, 3, '2024-04-15'),
+(43, 3, '2024-04-16'),
+(44, 3, '2024-04-17'),
+(45, 3, '2024-04-18'),
+(46, 3, '2024-04-19'),
+(47, 5, '2024-04-15'),
+(48, 5, '2024-04-16'),
+(49, 5, '2024-04-17'),
+(50, 5, '2024-04-18'),
+(51, 5, '2024-04-19'),
+(52, 6, '2024-04-15'),
+(53, 6, '2024-04-16'),
+(54, 6, '2024-04-17'),
+(55, 6, '2024-04-18'),
+(56, 6, '2024-04-19');
 
 --
 -- Index pour les tables déchargées
@@ -89,7 +114,7 @@ ALTER TABLE `llx_creche_days_off`
 -- AUTO_INCREMENT pour la table `llx_creche_days_off`
 --
 ALTER TABLE `llx_creche_days_off`
-  MODIFY `rowid` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `rowid` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -185,8 +185,8 @@ function getNextNumFac($db, $type = 'facture')
 		$newNum = 'ICAVO-';
 	}
 	
-	$sql = "SELECT num_fac, CAST(RIGHT(num_fac, 9) AS SIGNED) AS facOrder FROM " . $db->prefix() . "creche_factures 
-			WHERE num_fac LIKE '" . $newNum . "%' ORDER BY facOrder DESC";
+	$sql = "SELECT ref, CAST(RIGHT(ref, 9) AS SIGNED) AS facOrder FROM " . $db->prefix() . "facture 
+			WHERE ref LIKE '" . $newNum . "%' ORDER BY facOrder DESC";
     $req = $db->query($sql);
     $lastNum = $db->fetch_object($req)->facOrder;
 
@@ -201,6 +201,7 @@ function getNextNumFac($db, $type = 'facture')
 	return $newNum;
 }
 
+// Calcul pour la facture d'un contrat PAJE
 function calculPaje($db, $contratId, $month)
 {
 	$sql = "SELECT * FROM " . $db->prefix() . "creche_contrats 
@@ -211,12 +212,13 @@ function calculPaje($db, $contratId, $month)
 	
 	$days = explode(';', $contrat->days_of_week);
 	$nbDayWeek = ($contrat->type == 'occasionnel') ? 1 : count($days); // Nb de jours par semaine du contrat (de 1 à 5)
-	$sql = "SELECT price_ttc FROM " . $db->prefix() . "product 
+	$sql = "SELECT rowid, price_ttc FROM " . $db->prefix() . "product 
 	WHERE ref = 'F" . $nbDayWeek . "J'";
 	$req = $db->query($sql);
-	$dailyPrice = $db->fetch_object($req)->price_ttc; // Prix journalier (prix service)
+	$product = $db->fetch_object($req);
+	$dailyPrice = $product->price_ttc; // Prix journalier (prix service)
 	
-	if ($contrat->type == 'occasionnel') {
+	if ($contrat->type == 'occasionnel') { // Pour contrat occasionnel on utilise le pointage
 		$sql = "SELECT id, ref, datep, fk_action, code, label, fk_element, elementtype 
 		FROM " . $db->prefix() . "actioncomm
 		WHERE code = 'CRECHE_POINTAGE' 
@@ -225,10 +227,10 @@ function calculPaje($db, $contratId, $month)
 		AND label = 'arrivee' 
 		AND datep LIKE '" . $month . "%' ";
 		$req = $db->query($sql);
-		$nbDaysTotal = $db->num_rows($req);
+		$nbDaysTotal = $db->num_rows($req); // Nombre de jours du mois
 		$monthlyPrice = $nbDaysTotal * $dailyPrice; // Prix mensuel 
 		
-		return array($nbDaysTotal, $monthlyPrice);
+		return array($nbDaysTotal, $monthlyPrice, $product->rowid);
 	} else {
 		$nbDays = array();
 		$nbDaysTotal = 0; // Nb de jours annuel
@@ -242,8 +244,173 @@ function calculPaje($db, $contratId, $month)
 		$annualPrice = $nbDaysTotal * $dailyPrice; // Prix annuel
 		$monthlyPrice = $annualPrice / $nbMonth; // Prix mensuel (lissé)
 		
-		return array($nbDaysTotal / $nbMonth, $monthlyPrice);
+		return array($nbDaysTotal / $nbMonth, $monthlyPrice, $product->rowid);
+	}
+}
+
+// Calcul pour la facture d'un contrat PSU
+function calculPsu($db, $contratId, $month)
+{
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_contrats 
+			WHERE rowid = " . $contratId;
+    $req = $db->query($sql);
+	$contrat = $db->fetch_object($req);
+	
+	// Enfant
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_enfants 
+			WHERE rowid = " . $contrat->fk_enfants;
+    $req = $db->query($sql);
+	$enfant = $db->fetch_object($req);
+	
+	// Total des salaires et assimilés, nombre d'enfants
+	$sql = "SELECT total_salaires, nb_enfants FROM " . $db->prefix() . "creche_famille 
+			WHERE rowid = " . $enfant->fk_famille;
+    $req = $db->query($sql);
+	$infos_famille = $db->fetch_object($req);
+
+	// Taux d'effort
+	$sql = "SELECT taux FROM " . $db->prefix() . "creche_tx_effort 
+			WHERE nb_enfants = " . $infos_famille->nb_enfants;
+    $req = $db->query($sql);
+	$tx_effort = $db->fetch_object($req)->taux;
+	
+	// Pointages
+	$sql = "SELECT datep, code, label, fk_element  
+		FROM " . $db->prefix() . "actioncomm
+		WHERE code = 'CRECHE_POINTAGE' 
+		AND elementtype = 'enfants' 
+		AND fk_element = " . $contrat->fk_enfants . " 
+		AND datep LIKE '" . $month . "%' ";
+    $req = $db->query($sql);
+	$pointages = array();
+	while ($tmp = $db->fetch_object($req)) {
+		$date = explode(' ', $tmp->datep);
+		$pointages[$date[0]][$tmp->label] = $tmp;
 	}
 
+	$monthlyHours = 0; // Nombre d'heures mensuelle
+	$minuteToHour = array( // Convertir les minutes en heures
+		'15' => 0.25,
+		'30' => 0.5,
+		'45' => 0.75
+	);
+	foreach ($pointages as $day => $values) { // Calcul des heures de présences réelles 
+		$arrival = new DateTimeImmutable($values['arrivee']->datep);
+		$departure = new DateTimeImmutable($values['depart']->datep);
+		$interval = $departure->diff($arrival);
+		$diff = $interval->format('%H:%i');
+		$time = (round(strtotime($diff) / 900)) * 900; // Arrondi au 1/4 heure le plus proche
+		$rounded = date('h', $time) + $minuteToHour[date('i', $time)];
+		$monthlyHours += $rounded;
+	}
+
+	$hourlyPrice = (floatval($infos_famille->total_salaires) / 12) * $tx_effort / 100; // Tarif horaire
+	$monthlyPrice = $hourlyPrice * $monthlyHours; // Prix mensuel
+
+	return array($monthlyHours, $monthlyPrice, $hourlyPrice); 
+}
+
+function factuAddLine($db, $rowid, $socid, $contratid, $dateFac)
+{
+	$sql = "SELECT entity  
+	FROM " . $db->prefix() . "creche_famille WHERE fk_societe = " . $socid;
+	$req = $db->query($sql);
+	$entityId = $db->fetch_object($req)->entity;
 	
+	// Trouver le type de la crèche PAJE / PSU
+	$sql = "SELECT `type`  
+	FROM " . $db->prefix() . "entity_extrafields WHERE fk_object = " . $entityId;
+	$req = $db->query($sql);
+	$typeCreche = $db->fetch_object($req)->type;
+	$date = new DateTime($dateFac);
+	$date->modify('-1 month');
+	
+	if ($typeCreche == 'paje') {
+		list($qty, $monthlyPrice, $fk_product) = calculPaje($db, $contratid, $date->format('Y-m'));
+		$subPrice = $monthlyPrice / $qty;
+		$qty = round($qty, 2);
+		$product_type = 1;
+	} else {
+		list($qty, $monthlyPrice, $subPrice) = calculPsu($db, $contratid, $date->format('Y-m'));
+		$fk_product = 'NULL';
+		$qty = round($qty, 2);
+		$product_type = 0;
+	}
+	
+	$sql = "INSERT INTO " . $db->prefix() . "facturedet 
+	(fk_facture, fk_product, `description`, qty, subprice, total_ht, total_ttc, product_type) 
+	VALUES (" . $rowid . ", " . $fk_product . ", 'Accueil de l\'enfant à la crèche', " . $qty . ", " . $subPrice . ", " 
+	. $monthlyPrice . ", " . $monthlyPrice . ", " . $product_type . ")";
+	$req = $db->query($sql);
+	
+	// Mise à jour total facture
+	$sql = "UPDATE " . $db->prefix() . "facture 
+	SET total_ht = " . $monthlyPrice . ", total_ttc = " . $monthlyPrice . "
+	WHERE rowid = " . $rowid; 
+	$req = $db->query($sql);
+}
+
+function massCreateFac($db, $childrenIds, $object)
+{
+	global $user, $langs;
+	
+	foreach ($childrenIds as $id) {
+		$sql = "SELECT fk_societe, c.rowid as contratid  
+		FROM " . $db->prefix() . "creche_enfants AS e 
+		INNER JOIN " . $db->prefix() . "creche_famille AS f ON f.rowid = e.fk_famille 
+		INNER JOIN " . $db->prefix() . "creche_contrats AS c ON e.rowid = c.fk_enfants 
+		WHERE e.rowid = " . $id;
+		$req = $db->query($sql);
+		$res = $db->fetch_object($req);
+		$ref = getNextNumFac($db, 'facture');
+
+		// Création facture	
+		$sql = "INSERT INTO " . $db->prefix() . "facture (ref, entity, fk_soc, datec, datef, date_valid, tms, 
+		fk_statut, fk_user_author, fk_user_valid, fk_cond_reglement, note_private, model_pdf) 
+		VALUES ('" . $ref . "', 1, " . $res->fk_societe .", '" . date('Y-m-d H:i:s') . "', 
+		'" . date('Y-m-d') . "', '" . date('Y-m-d') . "', '" . date('Y-m-d H:i:s') . "', 0, " . $user->id . ", " 
+		. $user->id . ", 9, " . $res->contratid . ", 'sponge')";
+		$req = $db->query($sql);
+		$idFac = $db->last_insert_id($db->prefix() . "facture");
+
+		// Ajout de la line a la facture
+		factuAddLine($db, $idFac, $res->fk_societe, $res->contratid, date('Y-m-d'));
+
+		// Génération du PDF
+		$permissiontoadd = $user->rights->facture->creer;
+		$action = 'builddoc';
+		$object->fetch($idFac);
+		$upload_dir = '/usr/share/dolibarr/documents/facture';
+		if (empty($hidedetails)) {
+			$hidedetails = 0;
+		}
+		if (empty($hidedesc)) {
+			$hidedesc = 0;
+		}
+		if (empty($hideref)) {
+			$hideref = 0;
+		}
+		if (empty($moreparams)) {
+			$moreparams = null;
+		}
+		
+		$result = $object->generateDocument($object->model_pdf, $langs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		if ($result <= 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+		} else {
+			if (empty($donotredirect)) {
+				setEventMessages($langs->trans("FileGenerated"), null);
+			}
+		}
+
+		// Mise à jour facture
+		$pdfPath = 'facture/' . $ref . '/' . $ref . '.pdf';
+		$sql = "UPDATE " . $db->prefix() . "facture 
+		SET fk_statut = 1, last_main_doc = '" . $pdfPath . "' 
+		WHERE rowid = " . $idFac; 
+		$req = $db->query($sql);
+	}
+
+	header('Location: enfants_list.php');
+	exit;
 }

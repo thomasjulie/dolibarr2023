@@ -2017,6 +2017,9 @@ if (empty($reshook)) {
 				}
 			}
 
+			$reshook = $hookmanager->executeHooks('infansCrecheFactuAddLine', array('rowid' => $id, 'socid' => $object->socid, 
+			'contratid' => $object->note_private, 'dateFac' => GETPOST('reyear').'-'.GETPOST('remonth').'-'.GETPOST('reday')));
+
 			header('Location: '.$_SERVER["PHP_SELF"].'?facid='.$id);
 			exit();
 		} else {

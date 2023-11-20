@@ -264,12 +264,21 @@ print dol_get_fiche_head($head, 'contrats', $langs->trans("Enfants"), -1, $enfan
 
 $linkback = '<a href="'.dol_buildpath('/creche/famille_enfants.php', 1).'?id=' . $enfant->fk_famille . '">'.$langs->trans("Retour à la famille").'</a>';
 
+$sql = "SELECT fk_societe 
+		FROM " . $db->prefix() . "creche_famille 
+		WHERE rowid = " . $enfant->fk_famille;
+$req = $db->query($sql);
+$fk_soc = $db->fetch_object($req)->fk_societe;
+
 $sql = "SELECT * 
 		FROM " . $db->prefix() . "creche_contrats 
 		WHERE fk_enfants = " . $enfant->id;
 $req = $db->query($sql);
 
 dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
+
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche.lib.php';
+calculPsu($db, 1, '2023-10');
 
 // echo '<pre>';var_dump($enfantid, $enfant);echo '</pre>';
 ?>
@@ -368,7 +377,8 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 						</td>
 						<td>
 							<a class="butAction btn_autre" 
-							href="/custom/creche/factures_card.php?action=create&token=<?= newToken() ?>&idContrat=<?= $res->rowid ?>">
+							href="/compta/facture/card.php?action=create&note_private=<?= $res->rowid ?>&socid=<?= $fk_soc ?>&reyear=<?= date('Y') ?>&remonth=<?= date('m') ?>
+							&reday=<?= date('d') ?>&token=<?= newToken() ?>">
 							Facturer
 							</a>
 						</td>

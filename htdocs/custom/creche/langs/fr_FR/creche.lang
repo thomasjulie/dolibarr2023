@@ -97,3 +97,5 @@ fk_user_update = Modifié par
 date_creation = Date de création
 date_update = Date de modification
 fk_contrat = Contrat
+total_salaires = Total des salaires et assimilés
+fk_societe = Tiers
