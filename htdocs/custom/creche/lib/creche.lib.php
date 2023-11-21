@@ -365,11 +365,10 @@ function massCreateFac($db, $childrenIds, $object)
 		$ref = getNextNumFac($db, 'facture');
 
 		// Création facture	
-		$sql = "INSERT INTO " . $db->prefix() . "facture (ref, entity, fk_soc, datec, datef, date_valid, tms, 
-		fk_statut, fk_user_author, fk_user_valid, fk_cond_reglement, note_private, model_pdf) 
+		$sql = "INSERT INTO " . $db->prefix() . "facture (ref, entity, fk_soc, datec, datef, tms, 
+		fk_statut, fk_user_author, fk_cond_reglement, note_private, model_pdf) 
 		VALUES ('" . $ref . "', 1, " . $res->fk_societe .", '" . date('Y-m-d H:i:s') . "', 
-		'" . date('Y-m-d') . "', '" . date('Y-m-d') . "', '" . date('Y-m-d H:i:s') . "', 0, " . $user->id . ", " 
-		. $user->id . ", 9, " . $res->contratid . ", 'sponge')";
+		'" . date('Y-m-d') . "', '" . date('Y-m-d H:i:s') . "', 0, " . $user->id . ", 9, " . $res->contratid . ", 'sponge')";
 		$req = $db->query($sql);
 		$idFac = $db->last_insert_id($db->prefix() . "facture");
 
@@ -406,7 +405,7 @@ function massCreateFac($db, $childrenIds, $object)
 		// Mise à jour facture
 		$pdfPath = 'facture/' . $ref . '/' . $ref . '.pdf';
 		$sql = "UPDATE " . $db->prefix() . "facture 
-		SET fk_statut = 1, last_main_doc = '" . $pdfPath . "' 
+		SET fk_statut = 1, date_valid = '" . date('Y-m-d') . "', fk_user_valid = " . $user->id . " last_main_doc = '" . $pdfPath . "' 
 		WHERE rowid = " . $idFac; 
 		$req = $db->query($sql);
 	}
