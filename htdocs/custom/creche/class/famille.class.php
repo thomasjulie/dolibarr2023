@@ -116,10 +116,11 @@ class Famille extends CommonObject
 	public $fields=array(
 		"rowid" => array("type"=>"int", "label"=>"TechnicalID", "enabled"=>"1", 'position'=>10, 'notnull'=>1, "visible"=>"1",),
 		"libelle" => array("type"=>"varchar(100)", "label"=>"Libelle", "enabled"=>"1", 'position'=>20, 'notnull'=>1, "visible"=>"1", "searchall"=>"1",),
-		"mail" => array("type"=>"varchar(150)", "label"=>"Mail", "enabled"=>"1", 'position'=>25, 'notnull'=>0, "visible"=>-1, "searchall"=>"1",),
-		"tel_portable" => array("type"=>"varchar(20)", "label"=>"Telportable", "enabled"=>"1", 'position'=>30, 'notnull'=>0, "visible"=>-1, "searchall"=>"1",),
+		"mail" => array("type"=>"varchar(150)", "label"=>"Mail", "enabled"=>"1", 'position'=>25, 'notnull'=>0, "visible"=>"-1", "searchall"=>"1",),
+		"tel_portable" => array("type"=>"varchar(20)", "label"=>"Telportable", "enabled"=>"1", 'position'=>30, 'notnull'=>0, "visible"=>"-1", "searchall"=>"1",),
 		"total_salaires" => array("type"=>"double(24,8)", "label"=>"total_salaires", "enabled"=>"1", 'position'=>35, 'notnull'=>0, "visible"=>"1",),
-		"fk_societe" => array("type"=>"int", "label"=>"fk_societe", "enabled"=>"1", 'position'=>36, 'notnull'=>0, "visible"=>"1",),
+		"nb_enfants" => array("type"=>"int", "label"=>"nb_enfants", "enabled"=>"1", 'position'=>36, 'notnull'=>0, "visible"=>"1",),
+		"fk_societe" => array("type"=>"int", "label"=>"fk_societe", "enabled"=>"1", 'position'=>37, 'notnull'=>0, "visible"=>"1",),
 		"entity" => array("type"=>"int", "label"=>"Entity", "enabled"=>"1", 'position'=>16, 'notnull'=>1, "visible"=>"-1",),
 		"fk_user_create" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"Fkusercreate", "enabled"=>"1", 'position'=>35, 'notnull'=>1, "visible"=>"-1", "css"=>"maxwidth500 widthcentpercentminusxx", "csslist"=>"tdoverflowmax150",),
 		"date_create" => array("type"=>"datetime", "label"=>"Datecreate", "enabled"=>"1", 'position'=>40, 'notnull'=>1, "visible"=>"-1",),
@@ -131,6 +132,7 @@ class Famille extends CommonObject
 	public $mail;
 	public $tel_portable;
 	public $total_salaires;
+	public $nb_enfants;
 	public $fk_societe;
 	public $entity;
 	public $fk_user_create;

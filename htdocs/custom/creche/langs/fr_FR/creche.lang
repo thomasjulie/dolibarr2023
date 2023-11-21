@@ -99,3 +99,4 @@ date_update = Date de modification
 fk_contrat = Contrat
 total_salaires = Total des salaires et assimilés
 fk_societe = Tiers
+nb_enfants = Nombre d'enfant

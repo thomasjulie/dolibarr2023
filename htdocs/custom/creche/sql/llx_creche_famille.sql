@@ -21,6 +21,7 @@ CREATE TABLE llx_creche_famille(
 	mail varchar(150), 
 	tel_portable varchar(20), 
 	total_salaires double(24,8), 
+	nb_enfants int DEFAULT 1 NOT NULL,
 	fk_societe int, 
 	entity int DEFAULT 1 NOT NULL, 
 	fk_user_create integer NOT NULL, 
