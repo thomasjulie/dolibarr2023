@@ -356,6 +356,7 @@ if ($action == 'create') {
 	unset($object->fields['date_create']);
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
+	unset($object->fields['fk_societe']);
 	// unset($object->fields['entity']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
@@ -406,7 +407,7 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['fk_user_update']);
 	unset($object->fields['date_update']);
 	unset($object->fields['entity']);
-
+	unset($object->fields['fk_societe']);
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 
 	print '</table>';
