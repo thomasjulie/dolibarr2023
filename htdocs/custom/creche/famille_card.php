@@ -192,61 +192,11 @@ if (empty($reshook)) {
 	$triggermodname = 'CRECHE_MYOBJECT_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	
-	// controle que tel et mail n'existe pas déjà dans la table llx_creche_famille
-	$mail = GETPOST('mail');
-	$tel = GETPOST('tel_portable');
 	$submit = (GETPOST('add') != '') ? 'add' : 'save';
-	$msg = '';
-	
-	if ($submit == 'add') {
-		if ($mail != '') {
-			$sql = "SELECT mail 
-			FROM " . $db->prefix() . "creche_famille 
-			WHERE mail = '" . $mail . "'";
-			$req = $db->query($sql);
-			if ($db->num_rows($req) > 0) {
-				if ($msg != '') {
-					$msg .= "<br />";
-				}
-				$msg .= 'E-mail déjà utilisé';
-			}
-		}
-		
-		if ($tel != '') {
-			$sql = "SELECT tel_portable 
-			FROM " . $db->prefix() . "creche_famille 
-			WHERE tel_portable = '" . $tel . "'";
-			$req = $db->query($sql);
-			if ($db->num_rows($req) > 0) {
-				if ($msg != '') {
-					$msg .= "<br />";
-				}
-				$msg .= 'Numéro de téléphone déjà utilisé';
-			}
-		}
-	} 
+	$msg = ''; 
 
 	if (in_array($action, array('update', 'add'))) {
 		if (GETPOST('cancel') == '') { //Ne pas controller si on clic sur Annuler
-			if ($mail != '') {
-				if (!validateEmail($mail)) {
-					if ($msg != '') {
-						$msg .= "<br />";
-					}
-					$msg .= 'Veuillez renseigner un e-mail valide';
-				}
-			}
-			
-			if ($tel != '') {
-				if(!validateMobilePhone($tel)){
-					if ($msg != '') {
-						$msg .= "<br />";
-					}
-					$msg .= 'Veuillez renseigner un numéro de téléphone portable valide (doit être composé de 10 chiffres ou 9 si utilisation de +33)';
-				}
-			}
-
 			if (GETPOST('entity') == -1 && $action == 'add') { // choix de la crèche
 				if ($msg != '') {
 					$msg .= "<br />";
@@ -317,6 +267,20 @@ $excludeFields = [
 ];
 
 llxHeader('', $title, $help_url);
+
+$parents = array();
+$nbParent = 0;
+if ($action != 'create' && $object->id != null) {
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_parents WHERE fk_famille = " . $object->id;
+	$req = $db->query($sql);
+	$nbParent = $db->num_rows($req);
+	while ($p = $db->fetch_object($req)) {
+		$parents[] = $p;
+	}
+}
+
+unset($object->fields['mail']);
+unset($object->fields['tel_portable']);
 
 // Example : Adding jquery code
 // print '<script type="text/javascript">
@@ -648,7 +612,26 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			// Send
 			if (empty($user->socid)) {
 				$params = [];
-				if ($object->mail == '' || $user->email == '') {
+				$noMails = false;
+				$noTels = false;
+				if ($nbParent == 2) {
+					if ($parents[0]->mail == '' && $parents[1]->mail == '') {
+						$noMails = true;
+					}
+					if (($parents[0]->tel_portable == '' || preg_match("#^(\+33|0)[67][0-9]{8}$#", $parents[0]->tel_portable) == 0) 
+					&& ($parents[1]->tel_portable == '' || preg_match("#^(\+33|0)[67][0-9]{8}$#", $parents[1]->tel_portable) == 0)) {
+						$noTels = true;
+					}
+				} elseif ($nbParent == 1) {
+					if ($parents[0]->mail == '') {
+						$noMails = true;
+					}
+					if ($parents[0]->tel_portable == '' || 
+					preg_match("#^(\+33|0)[67][0-9]{8}$#", $parents[0]->tel_portable) == 0) {
+						$noTels = true;
+					}
+				}
+				if (empty($parents) || $noMails || $user->email == '') {
 					$params = ['attr' => ['classOverride' => 'butActionRefused', 'href' => '#']];
 				}
 				print dolGetButtonAction('', $langs->trans('SendMail'), 'default', $_SERVER["PHP_SELF"].'?id='.
@@ -657,13 +640,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 			if (empty($user->socid)) {
 				$params = [];
-				if ($object->tel_portable == null || $object->tel_portable == ''  
-					|| preg_match("#^(\+33|0)[67][0-9]{8}$#", $object->tel_portable) == 0) {
+				if (empty($parents) || $noTels) {
 					$params = ['attr' => ['classOverride' => 'butActionRefused', 'href' => '#']];
 				}
 				print dolGetButtonAction('', $langs->trans('SendSms'), 'default', 
-				$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presendSms&sendto=' . urlencode($object->tel_portable) . '&token='
-				.newToken() , '', 1, $params);
+				$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presendSms&sendto=' . urlencode($parents[0]->tel_portable) . /*',' 
+				. urlencode($parents[1]->tel_portable) . */'&token=' . newToken() , '', 1, $params);
 			}
 
 			// Back to draft

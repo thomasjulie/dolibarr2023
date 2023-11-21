@@ -104,7 +104,6 @@ if (!empty($backtopagejsfields)) {
 
 // Initialize technical objects
 $object = new Parents($db);
-$object->fields['tel_portable']['notnull'] = 0;
 $object->fields['mail']['notnull'] = 0;
 $object->fields['login']['notnull'] = 0;
 $object->fields['notif']['notnull'] = 0;
@@ -206,7 +205,7 @@ if (empty($reshook)) {
 	if ($submit == 'add') { // Créer un Tier pour le 1er parent
 		$sql = "SELECT rowid FROM " . $db->prefix() . "creche_parents WHERE fk_famille = " . GETPOST('fk_famille', 'int');
 		$req = $db->query($sql);
-		$nbParent = 0;//$db->num_rows($req);
+		$nbParent = $db->num_rows($req);
 		
 		if ($nbParent == 0) {
 			$name = GETPOST('prenom') . ' ' . GETPOST('nom');
@@ -224,6 +223,34 @@ if (empty($reshook)) {
 			$req = $db->query($sql);
 		} 
 	}
+
+	if ($submit == 'add') {
+		if ($mail != '') {
+			$sql = "SELECT mail 
+			FROM " . $db->prefix() . "creche_parents 
+			WHERE mail LIKE '" . $mail . "'";
+			$req = $db->query($sql);
+			if ($db->num_rows($req) > 0) {
+				if ($msg != '') {
+					$msg .= "<br />";
+				}
+				$msg .= 'E-mail déjà utilisé';
+			}
+		}
+		
+		if ($tel != '') {
+			$sql = "SELECT tel_portable 
+			FROM " . $db->prefix() . "creche_parents 
+			WHERE tel_portable = '" . $tel . "'";
+			$req = $db->query($sql);
+			if ($db->num_rows($req) > 0) {
+				if ($msg != '') {
+					$msg .= "<br />";
+				}
+				$msg .= 'Numéro de téléphone déjà utilisé';
+			}
+		}
+	} 
 
 	if (in_array($action, array('update', 'add'))) {
 		if (GETPOST('cancel') == '') { //Ne pas controller si on clic sur Annuler

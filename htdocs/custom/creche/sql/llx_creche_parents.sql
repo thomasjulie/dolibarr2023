@@ -30,7 +30,7 @@ CREATE TABLE llx_creche_parents(
 	login varchar(100) NOT NULL, 
 	mdp varchar(150) NOT NULL, 
 	notif tinyint(1), 
-	mode_notif enum("mail","sms"), 
+	mode_notif enum("","mail","sms"), 
 	fk_user_create integer NOT NULL, 
 	date_create datetime NOT NULL, 
 	fk_user_update integer NOT NULL, 

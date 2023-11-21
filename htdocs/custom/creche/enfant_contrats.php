@@ -277,9 +277,6 @@ $req = $db->query($sql);
 
 dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 
-require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche.lib.php';
-calculPsu($db, 1, '2023-10');
-
 // echo '<pre>';var_dump($enfantid, $enfant);echo '</pre>';
 ?>
 <link href="css/creche.css" type="text/css" rel="stylesheet">
