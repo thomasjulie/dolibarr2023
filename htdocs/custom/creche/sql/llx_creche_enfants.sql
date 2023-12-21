@@ -14,7 +14,7 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 
-CREATE TABLE llx_creche_enfants(
+CREATE TABLE IF NOT EXISTS llx_creche_enfants(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid int AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	fk_famille int NOT NULL, 
@@ -34,3 +34,5 @@ CREATE TABLE llx_creche_enfants(
 	date_update datetime NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
+
+ALTER TABLE llx_creche_enfants DROP infos_divers;

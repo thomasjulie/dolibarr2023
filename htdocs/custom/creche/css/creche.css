@@ -6,6 +6,8 @@
     background-color: #A4D8BD !important;
 }
 
+
+/* Pointage (accueil) */
 .children_container {
     display: flex;
     flex-direction: row;
@@ -46,6 +48,20 @@
     text-align: center;
 }
 
+.child__infos_name_alert {
+    display: flex;
+    flex-direction: row;
+}
+
+.child_alert {
+    width: 7px;
+    height:7px;
+    border: #e55e67 1px solid;
+    border-radius: 50%;
+    background-color: #e55e67;
+    margin-right: 5px;
+}
+
 .child_events {
     display: flex;
     flex-direction: row;
@@ -84,4 +100,67 @@
     padding: 8px 15px;
     min-width: 90px;
     text-align: center;
+}
+
+
+/* Infos médicales */
+#weightForm, #doctorForm, #allergyForm, #uploadContrat {
+    display: none;
+}
+
+
+/* Contrats */
+.notLinked td {
+    color: #e55e67;
+}
+
+.contratTable {
+    table-layout: fixed;
+}
+
+.contratTable .contratLabel {
+    word-wrap: break-word;
+}  
+
+#pdfFile {
+    width: 100px;
+}
+
+#pdfFile::file-selector-button {
+    display: none;
+}
+
+
+/* Bouton désactivé */
+.btnAddPlusDisabled {
+    pointer-events: none !important;
+}
+
+.btnAddPlusDisabled span {
+    filter: invert(50%);
+}
+
+.butActionRefused {
+    pointer-events: none;
+}
+
+
+.addFormTable {
+    padding: 8px;
+}
+
+.textBold {
+    font-weight: bold;
+    opacity: 0.6;
+}
+
+.centerText {
+    text-align: center;
+}
+
+.btn_update {
+    background: rgb(150, 110, 162, 0.95) !important;
+    color: white !important;
+    border-color: rgb(150, 110, 162, 0.95) !important;
+    border-radius: 2px !important;
 }

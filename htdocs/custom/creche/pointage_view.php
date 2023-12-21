@@ -1,5 +1,5 @@
 <?php
-
+// echo '<pre>';var_dump(/*retardVaccin($db, 1), */retardVaccin($db, 2));echo '</pre>';
 if ($user->rights->creche->pointage->write) {
 	$form = new Form($db);
 
@@ -41,13 +41,28 @@ if ($user->rights->creche->pointage->write) {
 				$photo = '<img src="custom/creche/viewimage.php?modulepart=creche&file=' 
 				. urlencode($file) . '&entity=' . $enfant->entity . '&type=enfants" style="width: auto;height: 100px;">';
 			}
+
+			list($alert, $infosAlert) = retardVaccin($db, $enfant->rowid);
+			$labelAlert = implode(', ', array_keys($infosAlert));
 			
 			?>
 			<div class="child">
 				<div class="child__infos">
-					<div class="child__infos_photo"><?= $photo ?></div>
+					<div class="child__infos_photo">
+						<a href="/custom/creche/enfants_card.php?id=<?= $enfant->rowid ?>" target="_blank">
+							<?= $photo ?>
+						</a>
+					</div>
 					<div class="child__infos_name">
-						<?= $enfant->prenom . ' ' . $enfant->nom ?><br />
+						<div class="child__infos_name_alert">
+							<?php if($alert): ?>
+								<a href="custom/creche/enfant_medicale.php?idEnfant=<?= $enfant->rowid ?>" target="_blank" 
+								title="Retard sur les vaccins <?= $labelAlert ?>">
+									<div class="child_alert"></div>
+								</a>
+							<?php endif; ?>
+							<?= $enfant->prenom . ' ' . $enfant->nom ?><br />
+						</div>
 						<a class="button" id="crechePointageBtn<?= $enfant->rowid ?>" onclick="var btn = document.getElementById('crechePointageBtn<?= $enfant->rowid ?>');btn.classList.remove('button');btn.classList.add('btn_disable');" 
 							href="index.php?action=tally&type=<?= ($type == 'arrivee') ? 'arrival' : 'departure' ?>&enfantid=<?= $enfant->rowid ?>&token=<?= newToken() ?>">
 							<?= ($type == 'arrivee') ? 'Arrivée' : 'Départ' ?>

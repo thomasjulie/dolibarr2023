@@ -34,8 +34,8 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/creche/class/enfants.class.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche_enfants.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/class/parents.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche_parents.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/creche/core/modules/creche/doc/pdf_contrats.php';
 
 // load module libraries
@@ -62,9 +62,8 @@ $mode       = GETPOST('mode', 'aZ'); // The output mode ('list', 'kanban', 'hier
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
 
-$enfantid = GETPOST('idEnfant', 'int');
+$parentid = GETPOST('idParent', 'int');
 $type = GETPOST('type', 'alpha');
-
 
 // Load variable for pagination
 $limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -80,11 +79,11 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 // Initialize technical objects
-$enfant = new Enfants($db);
-$enfant->fetch($enfantid);
+$parent = new Parents($db);
+$parent->fetch($parentid);
 // $object = new Contrats($db);
 $diroutputmassaction = $conf->creche->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('enfants_contrats')); 	// Note that conf->hooks_modules contains array of activated contexes
+$hookmanager->initHooks(array('parents_contrats')); 	// Note that conf->hooks_modules contains array of activated contexes
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
@@ -124,18 +123,18 @@ if ($action == 'sendEmail') { // Envoie du contrat par email
 	$file = basename($url);
 
 	$mails = array();
-	$sql = "SELECT * FROM " . $db->prefix() . "creche_famille WHERE rowid = " . $enfant->fk_famille;
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_famille WHERE rowid = " . $parent->fk_famille;
 	$req = $db->query($sql);
 	$famille = $db->fetch_object($req);
 	if ($famille->mail != '') { // Récupérer le mail de la famille
 		$mails[] = $famille->mail;
 	}
 	
-	$sql = "SELECT * FROM " . $db->prefix() . "creche_parents WHERE fk_famille = " . $enfant->fk_famille;
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_parents WHERE fk_famille = " . $parent->fk_famille;
 	$req = $db->query($sql);
-	while ($parent = $db->fetch_object($req)) { // Récupérer les mails des parents
-		if ($parent->mail != '') {
-			$mails[] = $parent->mail;
+	while ($p = $db->fetch_object($req)) { // Récupérer les mails des parents
+		if ($p->mail != '') {
+			$mails[] = $p->mail;
 		}
 	}
 
@@ -204,25 +203,32 @@ if ($action == 'sendEmail') { // Envoie du contrat par email
 		}
 	}
 
-	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	header('Location: parent_contrats.php?idParent=' . $parent->id);
 	exit;
- }
+}
 
- if ($action == 'uploadPdf') { // Upload PDF signé
+if ($action == 'uploadPdf') { // Upload PDF signé
 	$dossier = "/usr/share/dolibarr/documents/creche/contrats/" . GETPOST('idContrat') . "/";
 	if (isset($_FILES['signed_contract'])) {
+		if (!file_exists($dossier)) {
+			mkdir($dossier, 0777, true);
+		}
 		if (file_exists($dossier)) {
 			$fichier = GETPOST('final_path');
 			if(move_uploaded_file($_FILES['signed_contract']['tmp_name'], $fichier)) {
+				$sql = "UPDATE " . $db->prefix() . "creche_contrats 
+						SET file_path = '" . $fichier . "' 
+						WHERE rowid = " . GETPOST('idContrat');
+				$req = $db->query($sql);
 				setEventMessages('Fichier uploader', null);
 			}
 		}
 	}
-	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	header('Location: parent_contrats.php?idParent=' . $parent->id);
 	exit;
- }
+}
  
- if ($action == 'dossierComplet') { 
+if ($action == 'dossierComplet') { 
 	if (GETPOST('dossier_complet') == 1) {
 		$complet = 1;
 	} else {
@@ -233,10 +239,19 @@ if ($action == 'sendEmail') { // Envoie du contrat par email
 			WHERE rowid = " . GETPOST('id');
 	$req = $db->query($sql);
 
-	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	header('Location: parent_contrats.php?idParent=' . $parent->id);
 	exit;
- }
+}
 
+if ($action == 'linkContract') {
+	$sql = "UPDATE " . $db->prefix() . "creche_contrats 
+			SET fk_enfants = " . GETPOST('fk_enfants') . " 
+			WHERE rowid = " . GETPOST('contratid');
+	$req = $db->query($sql);
+
+	header('Location: parent_contrats.php?idParent=' . $parent->id);
+	exit;
+}
 
 
 /*
@@ -254,41 +269,88 @@ $help_url = '';
 
 // Output page
 // --------------------------------------------------------------------
-$title = $langs->trans("Enfants")." - ".$langs->trans('Contrats');
+$title = $langs->trans("Parents")." - ".$langs->trans('Contrats');
 $help_url = '';
 
 llxHeader('', $title, $help_url);
 
-$head = enfantsPrepareHead($enfant);
-print dol_get_fiche_head($head, 'contrats', $langs->trans("Enfants"), -1, $enfant->picto, 0, '', '', 0, '', 1);
+$head = parentsPrepareHead($parent);
+print dol_get_fiche_head($head, 'contrats', $langs->trans("Parents"), -1, $parent->picto, 0, '', '', 0, '', 1);
 
-$linkback = '<a href="'.dol_buildpath('/creche/famille_enfants.php', 1).'?id=' . $enfant->fk_famille . '">'.$langs->trans("Retour à la famille").'</a>';
+$linkback = '<a href="'.dol_buildpath('/creche/famille_parents.php', 1).'?id=' . $parent->fk_famille . '">'.$langs->trans("Retour à la famille").'</a>';
 
 $sql = "SELECT fk_societe 
 		FROM " . $db->prefix() . "creche_famille 
-		WHERE rowid = " . $enfant->fk_famille;
+		WHERE rowid = " . $parent->fk_famille;
 $req = $db->query($sql);
 $fk_soc = $db->fetch_object($req)->fk_societe;
 
 $sql = "SELECT * 
+		FROM " . $db->prefix() . "creche_enfants 
+		WHERE fk_famille = " . $parent->fk_famille;
+$reqEnfants = $db->query($sql);
+
+$contrats = array();
+$sql = "SELECT * 
 		FROM " . $db->prefix() . "creche_contrats 
-		WHERE fk_enfants = " . $enfant->id;
+		WHERE fk_parent_payeur = " . $parent->id;
 $req = $db->query($sql);
 
-dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
+$sql = "SELECT * 
+		FROM " . $db->prefix() . "creche_contrats 
+		WHERE fk_parent_payeur = " . $parent->id . "
+		AND fk_enfants = 0 
+		AND date_end > " . date('Y-m-d');
+$reqContratNonLier = $db->query($sql);
 
-// echo '<pre>';var_dump($enfantid, $enfant);echo '</pre>';
+dol_banner_tab($parent, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
+
+// echo '<pre>';var_dump($sql, $req);echo '</pre>';
 ?>
 <link href="css/creche.css" type="text/css" rel="stylesheet">
 <div class="fichecenter">
 		<div class="underbanner clearboth"></div>
+		<!-- Formulaire pour lier un contrat a un enfant (afficher seulement si il y a des contrats non liés) -->
+		<?php if ($db->num_rows($reqContratNonLier) > 0): ?>
+			<form method="post">
+				<h4>Lier un contrat à un enfant</h4>
+				<input type="hidden" name="token" value="<?= newToken() ?>">
+				<input type="hidden" name="action" value="linkContract">
+				<table>
+					<tr class="liste_titre">
+						<td class="wrapcolumntitle liste_titre">Enfant</td>
+						<td class="wrapcolumntitle liste_titre">Contrat</td>
+					</tr>
+					<tr>
+						<td class="addFormTable">
+							<select name="fk_enfants">
+								<option></option>
+								<?php while($e = $db->fetch_object($reqEnfants)): ?>
+									<option value="<?= $e->rowid ?>"><?= $e->prenom ?></option>				
+								<?php endwhile; ?>
+							</select>
+						</td>
+						<td class="addFormTable">
+							<select name="contratid">
+								<option></option>
+								<?php while($c = $db->fetch_object($reqContratNonLier)): ?>
+									<option value="<?= $c->rowid ?>"><?= $c->label ?></option>
+								<?php endwhile; ?>
+							</select>
+						</td>
+						<td rowspan="2" class="addFormTable"><input type="submit" value="Lier" class="button" ></td>
+					</tr>
+				</table>
+			</form><hr>
+		<?php endif; ?>
+
 		<table class="centpercent notopnoleftnoright table-fiche-title">
 			<tbody>
 				<tr>
 					<td class="nobordernopadding valignmiddle col-title"></td>
 					<td class="nobordernopadding valignmiddle right col-right">
 						<a class="btnTitle btnTitlePlus" 
-						href="/custom/creche/enfants_nouvcontrat.php?token=<?= newToken() ?>&idEnfant=<?= $enfant->id ?>" 
+						href="/custom/creche/parents_nouvcontrat.php?token=<?= newToken() ?>&idParent=<?= $parent->id ?>" 
 						title="Nouveau Contrat">
 							<span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span>
 						</a>
@@ -297,16 +359,17 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 			</tbody>
 		</table>
 		<!-- <hr> -->
-		<table class="tagtable liste">
+		<table class="tagtable liste contratTable">
 			<thead>
 				<tr class="liste_titre">
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Libellé") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Type") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Dates") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Heures") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Télécharger") ?></th>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Contrat Signé") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Contrat<br /> Signé") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Mail") ?></th>
-					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Dossier <br /> complet") ?></th>
+					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Dossier<br /> complet") ?></th>
 					<th class="wrapcolumntitle liste_titre"><?= $langs->trans("Facturer") ?></th>
 				</tr>
 			</thead>
@@ -315,19 +378,24 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 					$hours = json_decode($res->hours_of_day, true);
 					$dated = new DateTime($res->date_start);
 					$url = "/usr/share/dolibarr/documents/creche/contrats/" . $res->rowid ."/contrat_" . $dated->format('Y_m_d') . ".pdf";
+					$classPdf = 'butAction';
 					if (!file_exists($url)) {
-						$pdf = new pdf_standard_contrats($db);
-						$pdf->write_file($res, $langs);
+						// $pdf = new pdf_standard_contrats($db);
+						// $pdf->write_file($res, $langs);
+						$classPdf = 'butActionRefused';
 					}
 					?>
-					<tr>
+					<tr class="<?= $res->fk_enfants == 0 ? 'notLinked': '' ?>">
+						<td class="contratLabel">
+							<?= $res->label ?>
+						</td>
 						<td>
 							<?= $res->type ?>
 						</td>
 						<td><?= 'De ' . (new DateTime($res->date_start))->format('d/m/y') . '<br /> à ' 
 						. (new DateTime($res->date_end))->format('d/m/y') ?></td>
 						<td>
-							<?php if ($res->type == 'regulier'): ?>
+							<?php if ($res->type == 'regulier' || $res->type == 'periodique'): ?>
 								<?php if (isset($hours[1])): ?>
 									Lundi de <?= $hours[1]['start'] ?> à <?= $hours[1]['end'] ?><br />
 								<?php endif; ?>
@@ -346,8 +414,8 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 							<?php endif; ?>
 						</td>
 						<td>
-							<a class="butAction" 
-							href="/custom/creche/document.php?modulepart=creche&entity=<?= $enfant->entity ?>&file=<?= urlencode($url) ?>">PDF</a>
+							<a class="<?= $classPdf ?>" 
+							href="/custom/creche/document.php?modulepart=creche&entity=<?= $parent->entity ?>&file=<?= urlencode($url) ?>">PDF</a>
 						</td>
 						<td>
 							<form enctype="multipart/form-data" method="post">
@@ -355,25 +423,25 @@ dol_banner_tab($enfant, 'ref', $linkback, 1, 'ref', 'prenom', $morehtmlref);
 								<input type="hidden" name="token" value="<?= newToken() ?>" >
 								<input type="hidden" name="action" value="uploadPdf" >
 								<input type="hidden" name="idContrat" value="<?= $res->rowid ?>" >
-								<input type="file" name="signed_contract" accept=".pdf" style="width: 150px" /><br />
-								<input class="butAction" type="submit" value="Valider">
+								<input type="file" id="pdfFile" name="signed_contract" accept=".pdf" /><br />
+								<input class="butAction" type="submit" value="Charger">
 							</form>
 						</td>
 						<td>
-						<a class="butAction" 
-							href="/custom/creche/enfant_contrats.php?idEnfant=<?= $enfant->id ?>&action=sendEmail&id=<?= $res->rowid ?>">Email</a>
+							<a class="butAction" 
+								href="/custom/creche/parent_contrats.php?idParent=<?= $parent->id ?>&action=sendEmail&id=<?= $res->rowid ?>">Email</a>
 						</td>
 						<td>
 							<form method="post">
 								<input type="hidden" name="token" value="<?= newToken() ?>" >
 								<input type="hidden" name="action" value="dossierComplet" >
 								<input type="hidden" name="id" value="<?= $res->rowid ?>" >
-								<input type="checkbox" name="dossier_complet" value="1" <?= $res->dossier_complet == 1 ? 'checked' : '' ?>
-								 onchange="this.form.submit()">
+								<input type="checkbox" <?= $res->fk_enfants == 0 ? 'disabled': '' ?> name="dossier_complet" 
+								value="1" <?= $res->dossier_complet == 1 ? 'checked' : '' ?> onchange="this.form.submit()">
 							</form>
 						</td>
 						<td>
-							<a class="butAction btn_autre" 
+							<a class="<?= $res->fk_enfants == 0 ? 'butActionRefused': 'butAction btn_autre' ?>" 
 							href="/compta/facture/card.php?action=create&note_private=<?= $res->rowid ?>&socid=<?= $fk_soc ?>&reyear=<?= date('Y') ?>&remonth=<?= date('m') ?>
 							&reday=<?= date('d') ?>&token=<?= newToken() ?>">
 							Facturer

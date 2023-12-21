@@ -276,7 +276,13 @@ class ActionsCreche extends CommonHookActions
 
 					echo $out;
 					return 1;
-				} 
+				} elseif ($parameters['field'] == 'nb_enfants' && $parameters['currentcontext'] == 'famillecard') {
+					$value = ($parameters['value'] != '') ? $parameters['value'] : '1';
+					$out = '<input type="text" class="flat maxwidth75 --success" name="nb_enfants" id="nb_enfants" 
+					value="' . $value . '">';
+					echo $out;
+					return 1;
+				}
 				
 			}
 		}
@@ -402,7 +408,7 @@ class ActionsCreche extends CommonHookActions
 		// echo '<pre>';var_dump($parameters);echo '</pre>';
 		
 		$error = 0; // Error counter
-		if (in_array($parameters['currentcontext'], array('enfantscard', 'enfantsdocument', 'enfants_contrats'))) { 
+		if (in_array($parameters['currentcontext'], array('enfantscard', 'enfantsdocument'))) { 
 			if ($conf->creche->enabled) {
 				if (isset($parameters['rowid'])) {
 					$sql = "SELECT photo_id, entity  

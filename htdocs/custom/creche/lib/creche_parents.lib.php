@@ -87,6 +87,11 @@ function parentsPrepareHead($object)
 		$h++;
 	}
 
+	$head[$h][0] = dol_buildpath("/custom/creche/parent_contrats.php", 1).'?idParent='.$object->id;
+	$head[$h][1] = $langs->trans("Contrats");
+	$head[$h][2] = 'contrats';
+	$h++;
+
 	// if ($showtabofpageagenda) {
 	// 	$head[$h][0] = dol_buildpath("/creche/parents_agenda.php", 1).'?id='.$object->id;
 	// 	$head[$h][1] = $langs->trans("Events");

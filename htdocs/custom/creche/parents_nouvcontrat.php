@@ -34,8 +34,8 @@ if (!$res) {
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/creche/class/enfants.class.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche_enfants.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/class/parents.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/creche/lib/creche_parents.lib.php';
 
 // load module libraries
 require_once __DIR__.'/class/contrats.class.php';
@@ -61,7 +61,7 @@ $mode       = GETPOST('mode', 'aZ'); // The output mode ('list', 'kanban', 'hier
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
 
-$enfantid = GETPOST('idEnfant', 'int');
+$parentid = GETPOST('idParent', 'int');
 $type = GETPOST('type', 'alpha');
 
 
@@ -79,11 +79,11 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 // Initialize technical objects
-$enfant = new Enfants($db);
-$enfant->fetch($enfantid);
+$parent = new Parents($db);
+$parent->fetch($parentid);
 // $object = new Contrats($db);
 $diroutputmassaction = $conf->creche->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('enfants_contrats')); 	// Note that conf->hooks_modules contains array of activated contexes
+$hookmanager->initHooks(array('parents_contrats')); 	// Note that conf->hooks_modules contains array of activated contexes
 
 // There is several ways to check permission.
 // Set $enablepermissioncheck to 1 to enable a minimum low level of checks
@@ -119,12 +119,14 @@ if (!$permissiontoread) accessforbidden();
 	$date_end = GETPOST('date_end');
 	$$hours_of_day = '';
 	$days_of_week = '';
+	$startParts = explode('-', $date_start);
+	$label = $parent->nom . '_' . $type . '_' . $startParts[0] . $startParts[1] . $startParts[2];
 
 	$sql = "INSERT INTO " . $db->prefix() . "creche_contrats 
-	(fk_enfants, entity, type, date_start, date_end, days_of_week, hours_of_day, date_created, dossier_complet)
-	VALUES (" . $enfant->id . ", " . $enfant->entity . ", '" . $type . "', '" . $date_start . "', '" . $date_end . "', ";
+	(fk_parent_payeur, entity, type, date_start, date_end, days_of_week, hours_of_day, date_created, dossier_complet, fk_enfants, label)
+	VALUES (" . $parent->id . ", " . $parent->entity . ", '" . $type . "', '" . $date_start . "', '" . $date_end . "', ";
 
-	if ($type == 'regulier') {
+	if ($type == 'regulier' || $type == 'periodique') {
 		$nb_day = 'NULL';
 		$day_1 = null;
 		$day_2 = null;
@@ -172,10 +174,10 @@ if (!$permissiontoread) accessforbidden();
 		$days_of_week = implode(';', $tmpDays);
 	}
 
-	$sql .= "'" . $days_of_week . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "', 0)";
+	$sql .= "'" . $days_of_week . "', '" . $hours_of_day . "', '" . date('Y-m-d') . "', 0, 0, '" . $label . "')";
 	$req = $db->query($sql);
 
-	header('Location: enfant_contrats.php?idEnfant=' . $enfant->id);
+	header('Location: parent_contrats.php?idParent=' . $parent->id);
 	exit;
 }
 
@@ -197,7 +199,7 @@ $help_url = '';
 
 // Output page
 // --------------------------------------------------------------------
-$title = $langs->trans("Enfants")." - ".$langs->trans('Contrats');
+$title = $langs->trans("Parents")." - ".$langs->trans('Contrats');
 $help_url = '';
 
 llxHeader('', $title, $help_url);
@@ -206,8 +208,8 @@ if (empty($permissiontoadd)) {
 	accessforbidden('NotEnoughPermissions', 0, 1);
 }
 
-print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("Contrat")), '', 'object_'.$enfant->picto);
-// echo '<pre>';var_dump($enfantid, $enfant);echo '</pre>';
+print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("Contrat")), '', 'object_'.$parent->picto);
+// echo '<pre>';var_dump();echo '</pre>';
 ?>
 <hr><br />
 <form method="post">
@@ -217,6 +219,7 @@ print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv(
 		<option>Choisir le type de contrat</option>
 		<option value="occasionnel" <?= $type == 'occasionnel' ? 'selected' : '' ?>>Occasionnel</option>
 		<option value="regulier" <?= $type == 'regulier' ? 'selected' : '' ?>>Régulier</option>
+		<option value="periodique" <?= $type == 'periodique' ? 'selected' : '' ?>>Périodique</option>
 	</select>
 </form><br />
 
@@ -244,7 +247,7 @@ print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv(
 					<input type="date" name="date_end">
 				</td>
 			</tr>
-			<?php if ($type == 'regulier'): ?>
+			<?php if ($type == 'regulier' || $type == 'periodique'): ?>
 				<!-- <tr>
 					<td>
 						Jours de la semaine

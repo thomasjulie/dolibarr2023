@@ -243,6 +243,8 @@ $help_url = '';
 
 llxHeader('', $title, $help_url);
 
+unset($object->fields['code_facture']);
+
 // Example : Adding jquery code
 // print '<script type="text/javascript">
 // jQuery(document).ready(function() {

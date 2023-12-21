@@ -14,7 +14,7 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 
-CREATE TABLE llx_creche_contrats(
+CREATE TABLE IF NOT EXISTS llx_creche_contrats(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid int AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	fk_enfants int NOT NULL, 
@@ -30,3 +30,6 @@ CREATE TABLE llx_creche_contrats(
 	dossier_complet int NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
+
+ALTER TABLE llx_creche_contrats ADD label VARCHAR(255) NULL AFTER entity;
+ALTER TABLE llx_creche_contrats ADD fk_parent_payeur INT NOT NULL AFTER entity;

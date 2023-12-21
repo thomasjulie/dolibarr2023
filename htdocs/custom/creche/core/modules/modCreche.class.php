@@ -244,7 +244,19 @@ class modCreche extends DolibarrModules
 		 );
 		 */
 		/* BEGIN MODULEBUILDER DICTIONARIES */
-		$this->dictionaries = array();
+		$this->dictionaries=array(
+			'langs'=>'creche@creche',
+			'tabname'=>array('c_crechevaccins'),
+			'tablib'=>array('CrecheVaccins'),
+			'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM llx_c_crechevaccins as f'),
+			'tabsqlsort'=>array('label ASC'),
+			'tabfield'=>array('code,label'),
+			'tabfieldvalue'=>array('code,label'),
+			'tabfieldinsert'=>array('code,label'),
+			'tabrowid'=>array('rowid'),
+			'tabcond'=>array(isModEnabled('creche')),
+			'tabhelp'=>array(array('code'=>$langs->trans('CodeTooltipHelp'), 'field2' => 'field2tooltip')),
+		);
 		/* END MODULEBUILDER DICTIONARIES */
 
 		// Boxes/Widgets
@@ -380,7 +392,7 @@ class modCreche extends DolibarrModules
 			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
 			'mainmenu'=>'creche',
 			'leftmenu'=>'',
-			'url'=>'/creche/famille_list.php',
+			'url'=>'/creche/enfants_list.php',
 			'langs'=>'creche@creche', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000 + $r,
 			'enabled'=>'isModEnabled("creche")', // Define condition to show or hide menu entry. Use 'isModEnabled("creche")' if entry must be visible if module is enabled.

@@ -515,6 +515,7 @@ if (GETPOST('nomassaction', 'int') || in_array($massaction, array('presend', 'pr
 }
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
+print '<link href="css/creche.css" type="text/css" rel="stylesheet">';
 print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">'."\n";
 if ($optioncss != '') {
 	print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
@@ -789,7 +790,7 @@ while ($i < $imaxinloop) {
 				} elseif ($key == 'rowid') {
 					print $object->showOutputField($val, $key, $object->id, '');
 				} else {
-					$reshook = $hookmanager->executeHooks('showFieldValue', array('field' => $key, 'type' => $val['type'], 'value' => $object->$key));
+					$reshook = $hookmanager->executeHooks('infansCrecheShowFieldValue', array('field' => $key, 'type' => $val['type'], 'value' => $object->$key));
 					if (empty($reshook)) {
 						print $object->showOutputField($val, $key, $object->$key, '');
 					}

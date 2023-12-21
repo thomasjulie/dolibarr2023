@@ -105,25 +105,33 @@ $sql = "SELECT *
 		FROM " . $db->prefix() . "creche_parents 
 		WHERE fk_famille = " . $famid;
 $req = $db->query($sql);
+$nbParents = $db->num_rows($req);
+$classAdd = '';
+if ($nbParents >= 2) {
+	$classAdd = ' btnAddPlusDisabled';
+}
 
 dol_banner_tab($fam, 'ref', $linkback, 1, 'ref', 'libelle'); ?>
 
+<link href="css/creche.css" type="text/css" rel="stylesheet">
 	<div class="fichecenter">
 		<div class="underbanner clearboth"></div>
-		<table class="centpercent notopnoleftnoright table-fiche-title">
-			<tbody>
-				<tr>
-					<td class="nobordernopadding valignmiddle col-title"></td>
-					<td class="nobordernopadding valignmiddle right col-right">
-						<a class="btnTitle btnTitlePlus" 
-						href="/custom/creche/parents_card.php?action=create&token=<?= newToken() ?>&famid=<?= $fam->id ?>" 
-						title="Nouveau Parent">
-							<span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span>
-						</a>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		
+			<table class="centpercent notopnoleftnoright table-fiche-title">
+				<tbody>
+					<tr>
+						<td class="nobordernopadding valignmiddle col-title"></td>
+						<td class="nobordernopadding valignmiddle right col-right">
+							<a class="btnTitle btnTitlePlus<?= $classAdd ?>" 
+							href="/custom/creche/parents_card.php?action=create&token=<?= newToken() ?>&famid=<?= $fam->id ?>" 
+							title="Nouveau Parent">
+								<span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		
 		<!-- <hr> -->
 		<table class="tagtable liste">
 			<thead>

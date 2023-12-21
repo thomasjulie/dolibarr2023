@@ -96,9 +96,15 @@ function enfantsPrepareHead($object)
 		$h++;
 	}
 */
-	$head[$h][0] = dol_buildpath("/custom/creche/enfant_contrats.php", 1).'?idEnfant='.$object->id;
-	$head[$h][1] = $langs->trans("Contrats");
-	$head[$h][2] = 'contrats';
+	
+	$head[$h][0] = dol_buildpath("/custom/creche/enfant_medicale.php", 1).'?idEnfant='.$object->id;
+	$head[$h][1] = $langs->trans("Infos Médicales");
+	$head[$h][2] = 'medic';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/custom/creche/enfant_divers.php", 1).'?idEnfant='.$object->id;
+	$head[$h][1] = $langs->trans("Infos Diverses");
+	$head[$h][2] = 'divers';
 	$h++;
 
 

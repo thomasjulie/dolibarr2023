@@ -416,3 +416,72 @@ function massCreateFac($db, $childrenIds, $object)
 	header('Location: enfants_list.php');
 	exit;
 }
+
+function retardVaccin($db, $enfantId)
+{
+	$alert = false;
+	$infosAlert = array();
+
+	$sql = "SELECT * FROM " . $db->prefix() . "creche_enfants 
+			WHERE rowid = " . $enfantId;
+    $req = $db->query($sql);
+	$enfant = $db->fetch_object($req);
+	$dateN = new DateTime($enfant->date_naissance);
+
+	$sql = "SELECT * FROM " . $db->prefix() . "c_crechevaccins";
+	$reqVaccins = $db->query($sql);
+	
+	$sql = "SELECT fk_vaccins, date_1_injection, date_1_rappel, date_2_rappel 
+			FROM " . $db->prefix() . "creche_vaccin 
+			WHERE fk_enfants = " . $enfantId;
+	$reqVaccinsEnfant = $db->query($sql);
+	$vaccinsEnfant = array();
+	while ($vac = $db->fetch_object($reqVaccinsEnfant)) {
+		$vaccinsEnfant[$vac->fk_vaccins] = $vac;
+	}
+	
+	// boucle sur tous les vaccins du dictionnaire
+	while ($row = $db->fetch_object($reqVaccins)) {
+		// l'enfant a déjà reçu au moins 1 injection pour ce vaccin
+		if (array_key_exists($row->rowid, $vaccinsEnfant)) {
+			// toutes les injections nécessaires pour ce vaccin on été effectué
+			if (($vaccinsEnfant[$row->rowid]->date_1_injection != null || $row->injection_1 == 0) 
+				&& ($vaccinsEnfant[$row->rowid]->date_1_rappel != null || $row->rappel_1 == 0) 
+				&& ($vaccinsEnfant[$row->rowid]->date_2_rappel != null || $row->rappel_2 == 0)) {
+				continue;
+			} else {
+				// si un 2ème (ou 1er) rappel pour ce vaccin est nécessaire ET il n'a pas été effectué
+				if ($vaccinsEnfant[$row->rowid]->date_1_rappel == null && $row->rappel_1 != 0) {
+					$newDate = clone $dateN;
+					$newDate->modify('first day of +' . $row->rappel_1 . 'months');
+					// la date du rappel 1 est dépassé
+					if ($newDate->format('Y-m') . '-' . $dateN->format('d') < date('Y-m-d')) {
+						$alert = true;
+						$infosAlert[$row->label] = 'rappel_1';
+					}
+				} elseif ($vaccinsEnfant[$row->rowid]->date_2_rappel == null && $row->rappel_2 != 0) {
+					$newDate = clone $dateN;
+					$newDate->modify('first day of +' . $row->rappel_2 . 'months');
+					// la date du rappel 2 est dépassé
+					if ($newDate->format('Y-m') . '-' . $dateN->format('d') < date('Y-m-d')) {
+						$alert = true;
+						$infosAlert[$row->label] = 'rappel_2';
+					}
+				}
+			}
+		} else { // l'enfant n'a reçu aucune injection pour ce vaccin
+			// la 1ère injection pour ce vaccin n'a pas été effectué
+			if ($vaccinsEnfant[$row->rowid]->date_1_injection == null && $row->injection_1 != 0) {
+				$newDate = clone $dateN;
+				$newDate->modify('first day of +' . $row->injection_1 . 'months');
+				// la date de la 1ère injection est dépassé
+				if ($newDate->format('Y-m') . '-' . $dateN->format('d') < date('Y-m-d')) {
+					$alert = true;
+					$infosAlert[$row->label] = 'injection_1';
+				}
+			}
+		}
+	}
+
+	return array($alert, $infosAlert);
+}
